@@ -1,0 +1,31 @@
+version: '3.5'
+
+services:
+  redis:
+    image: redis
+    container_name: redis_container
+    expose:
+      - 6379
+
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-bookings_service}
+      PGDATA: /data/postgres
+    volumes:
+      - ./db/data.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
