@@ -25,9 +25,9 @@ curl -X GET -H "Content-Type: application/json" \
 router.get('/bookings/', async (req, res) => {
   const { date, tableNumber, openedStatus } = req.query;
 
-  if (!date) return res.status(400).send({ errorCode: 'DATE_MANDATORY' });
+  if (!date) return res.status(400).send({ type: 'error', reason: 'REQUIRED_ERROR', message: 'DATE_MANDATORY' });
 
-  if (Number.isNaN(Date.parse(date))) { return res.status(422).send({ errorCode: 'DATE_BAD_FORMAT' }); }
+  if (Number.isNaN(Date.parse(date))) { return res.status(422).send({ type: 'error', reason: 'VALIDATION_ERROR', message: 'DATE_BAD_FORMAT' }); }
 
   const bookings = await knex('bookings')
     .where({
@@ -52,7 +52,7 @@ router.get('/bookings/:id', async (req, res) => {
     })
     .select();
 
-  if (!booking) return res.status(404).send({ errorCode: 'BOOKING_NOT_FOUND' });
+  if (!booking) return res.status(404).send({ type: 'error', reason: 'NOT_FOUND_ERROR', message: 'BOOKING_NOT_FOUND' });
 
   return res.status(200).send(booking);
 });
@@ -84,7 +84,7 @@ router.put('/bookings/:id', async (req, res) => {
   if (typeof openedStatus !== 'undefined' && openedStatus === null) { errors.push({ openedStatus: 'REQUIRED' }); }
   if (typeof totalBilled !== 'undefined' && !Number.isInteger(totalBilled)) { errors.push({ totalBilled: 'BAD_FORMAT' }); }
 
-  if (errors.length > 0) { return res.status(422).send({ errorCode: 'VALIDATION_ERROR', errors }); }
+  if (errors.length > 0) { return res.status(422).send({ type: 'error', reason: 'VALIDATION_ERROR', errors }); }
 
   const params = {
     ...(personName && { person_name: personName }),
@@ -101,7 +101,7 @@ router.put('/bookings/:id', async (req, res) => {
     })
     .update(params, ['*']);
 
-  if (!updatedBooking) { return res.status(404).send({ errorCode: 'BOOKING_NOT_FOUND' }); }
+  if (!updatedBooking) { return res.status(404).send({ type: 'error', reason: 'NOT_FOUND_ERROR' }); }
 
   return res.status(200).send(keysToCamel(updatedBooking));
 });
@@ -118,7 +118,7 @@ router.delete('/bookings/:id', async (req, res) => {
     })
     .delete();
 
-  if (deletedBooking === 0) { return res.status(404).send({ errorCode: 'BOOKING_NOT_FOUND' }); }
+  if (deletedBooking === 0) { return res.status(404).send({ type: 'error', reason: 'NOT_FOUND_ERROR', message: 'BOOKING_NOT_FOUND' }); }
 
   return res.status(200).send({
     id: req.params.id,
@@ -150,7 +150,7 @@ router.post('/bookings/', async (req, res) => {
   if (typeof openedStatus === 'undefined' || openedStatus === null) { errors.push({ openedStatus: 'REQUIRED' }); }
   if (typeof totalBilled !== 'undefined' && !Number.isInteger(totalBilled)) { errors.push({ totalBilled: 'BAD_FORMAT' }); }
 
-  if (errors.length > 0) { return res.status(422).send({ errorCode: 'VALIDATION_ERROR', errors }); }
+  if (errors.length > 0) { return res.status(422).send({ type: 'error', reason: 'VALIDATION_ERROR', errors }); }
 
   const params = {
     id: generateUUIDV4(),

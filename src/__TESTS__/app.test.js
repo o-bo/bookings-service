@@ -40,21 +40,33 @@ describe('testing-server-routes', () => {
     await knex('bookings').insert(BOOKING_PARAMS, ['*']);
     const { status, body } = await request(app).get(`/bookings/${v4()}`);
     expect(status).toEqual(404);
-    expect(body).toEqual({ errorCode: 'BOOKING_NOT_FOUND' });
+    expect(body).toEqual({
+      message: 'BOOKING_NOT_FOUND',
+      type: 'error',
+      reason: 'NOT_FOUND_ERROR',
+    });
   });
 
   it('GET /bookings - fail - no date passed', async () => {
     await knex('bookings').insert(BOOKING_PARAMS, ['*']);
     const { status, body } = await request(app).get('/bookings');
     expect(status).toEqual(400);
-    expect(body).toEqual({ errorCode: 'DATE_MANDATORY' });
+    expect(body).toEqual({
+      message: 'DATE_MANDATORY',
+      type: 'error',
+      reason: 'REQUIRED_ERROR',
+    });
   });
 
   it('GET /bookings - fail - bad date format', async () => {
     await knex('bookings').insert(BOOKING_PARAMS, ['*']);
     const { status, body } = await request(app).get('/bookings?date=erzere');
     expect(status).toEqual(422);
-    expect(body).toEqual({ errorCode: 'DATE_BAD_FORMAT' });
+    expect(body).toEqual({
+      message: 'DATE_BAD_FORMAT',
+      type: 'error',
+      reason: 'VALIDATION_ERROR',
+    });
   });
 
   it('GET /bookings - success - date only', async () => {
@@ -128,7 +140,7 @@ describe('testing-server-routes', () => {
     await knex('bookings').insert(BOOKING_PARAMS, ['*']);
     const { status, body } = await request(app).delete(`/bookings/${v4()}`);
     expect(status).toEqual(404);
-    expect(body).toEqual({ errorCode: 'BOOKING_NOT_FOUND' });
+    expect(body).toEqual({ type: 'error', reason: 'NOT_FOUND_ERROR', message: 'BOOKING_NOT_FOUND' });
   });
 
   it('POST /bookings - success', async () => {
@@ -157,7 +169,8 @@ describe('testing-server-routes', () => {
     };
     const { status, body } = await request(app).post('/bookings').send(params);
     expect(status).toEqual(422);
-    expect(body.errorCode).toEqual('VALIDATION_ERROR');
+    expect(body.type).toEqual('error');
+    expect(body.reason).toEqual('VALIDATION_ERROR');
     expect(body.errors).toMatchObject([
       { personName: 'REQUIRED' },
       { peopleNumber: 'REQUIRED' },
@@ -171,7 +184,8 @@ describe('testing-server-routes', () => {
     const params = {};
     const { status, body } = await request(app).post('/bookings').send(params);
     expect(status).toEqual(422);
-    expect(body.errorCode).toEqual('VALIDATION_ERROR');
+    expect(body.type).toEqual('error');
+    expect(body.reason).toEqual('VALIDATION_ERROR');
     expect(body.errors).toMatchObject([
       { personName: 'REQUIRED' },
       { peopleNumber: 'REQUIRED' },
@@ -191,7 +205,8 @@ describe('testing-server-routes', () => {
     };
     const { status, body } = await request(app).post('/bookings').send(params);
     expect(status).toEqual(422);
-    expect(body.errorCode).toEqual('VALIDATION_ERROR');
+    expect(body.type).toEqual('error');
+    expect(body.reason).toEqual('VALIDATION_ERROR');
     expect(body.errors).toMatchObject([{ date: 'BAD_FORMAT' }]);
   });
 
@@ -206,7 +221,8 @@ describe('testing-server-routes', () => {
     };
     const { status, body } = await request(app).post('/bookings').send(params);
     expect(status).toEqual(422);
-    expect(body.errorCode).toEqual('VALIDATION_ERROR');
+    expect(body.type).toEqual('error');
+    expect(body.reason).toEqual('VALIDATION_ERROR');
     expect(body.errors).toMatchObject([{ totalBilled: 'BAD_FORMAT' }]);
   });
 
@@ -228,10 +244,7 @@ describe('testing-server-routes', () => {
   });
 
   it('PUT /bookings/:id - fail - required data null', async () => {
-    const [{ id }] = await knex('bookings').insert(
-      BOOKING_PARAMS,
-      ['*'],
-    );
+    const [{ id }] = await knex('bookings').insert(BOOKING_PARAMS, ['*']);
     const params = {
       personName: null,
       peopleNumber: null,
@@ -243,7 +256,8 @@ describe('testing-server-routes', () => {
       .put(`/bookings/${id}`)
       .send(params);
     expect(status).toEqual(422);
-    expect(body.errorCode).toEqual('VALIDATION_ERROR');
+    expect(body.type).toEqual('error');
+    expect(body.reason).toEqual('VALIDATION_ERROR');
     expect(body.errors).toMatchObject([
       { personName: 'REQUIRED' },
       { peopleNumber: 'REQUIRED' },
@@ -254,10 +268,7 @@ describe('testing-server-routes', () => {
   });
 
   it('PUT /bookings/:id - fail - bad date format', async () => {
-    const [{ id }] = await knex('bookings').insert(
-      BOOKING_PARAMS,
-      ['*'],
-    );
+    const [{ id }] = await knex('bookings').insert(BOOKING_PARAMS, ['*']);
     const params = {
       personName: 'foo',
       peopleNumber: 4,
@@ -269,15 +280,13 @@ describe('testing-server-routes', () => {
       .put(`/bookings/${id}`)
       .send(params);
     expect(status).toEqual(422);
-    expect(body.errorCode).toEqual('VALIDATION_ERROR');
+    expect(body.type).toEqual('error');
+    expect(body.reason).toEqual('VALIDATION_ERROR');
     expect(body.errors).toMatchObject([{ date: 'BAD_FORMAT' }]);
   });
 
   it('PUT /bookings/:id - fail - bad billed amount format', async () => {
-    const [{ id }] = await knex('bookings').insert(
-      BOOKING_PARAMS,
-      ['*'],
-    );
+    const [{ id }] = await knex('bookings').insert(BOOKING_PARAMS, ['*']);
     const params = {
       personName: 'foo',
       peopleNumber: 4,
@@ -290,7 +299,8 @@ describe('testing-server-routes', () => {
       .put(`/bookings/${id}`)
       .send(params);
     expect(status).toEqual(422);
-    expect(body.errorCode).toEqual('VALIDATION_ERROR');
+    expect(body.type).toEqual('error');
+    expect(body.reason).toEqual('VALIDATION_ERROR');
     expect(body.errors).toMatchObject([{ totalBilled: 'BAD_FORMAT' }]);
   });
 
@@ -307,7 +317,8 @@ describe('testing-server-routes', () => {
       .put(`/bookings/${v4()}`)
       .send(params);
     expect(status).toEqual(404);
-    expect(body.errorCode).toEqual('BOOKING_NOT_FOUND');
+    expect(body.type).toEqual('error');
+    expect(body.reason).toEqual('NOT_FOUND_ERROR');
   });
 
   it('PUT /bookings/:id - fail - bad id', async () => {
@@ -323,7 +334,8 @@ describe('testing-server-routes', () => {
       .put('/bookings/foobar')
       .send(params);
     expect(status).toEqual(422);
-    expect(body.errorCode).toEqual('VALIDATION_ERROR');
+    expect(body.type).toEqual('error');
+    expect(body.reason).toEqual('VALIDATION_ERROR');
     expect(body.errors).toMatchObject([{ id: 'BAD_FORMAT' }]);
   });
 });
