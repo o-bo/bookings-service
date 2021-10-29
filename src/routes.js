@@ -14,6 +14,10 @@ const { keysToCamel } = require('./utils');
 
 const router = express.Router();
 
+const asyncHandler = (fn) => (req, res, next) => Promise
+  .resolve(fn(req, res, next))
+  .catch(next);
+
 /* GET /health */
 router.get('/health', async (req, res) => res.status(200).send({ status: 'ok' }));
 
@@ -22,7 +26,7 @@ GET /bookings
 curl -X GET -H "Content-Type: application/json" \
     localhost:3000/bookings\?date\=2021\-10\-10
 */
-router.get('/bookings/', async (req, res) => {
+router.get('/bookings/', asyncHandler(async (req, res) => {
   const { date, tableNumber, openedStatus } = req.query;
 
   if (!date) return res.status(400).send({ type: 'error', reason: 'REQUIRED_ERROR', message: 'DATE_MANDATORY' });
@@ -38,14 +42,14 @@ router.get('/bookings/', async (req, res) => {
     .select();
 
   return res.status(200).send(bookings);
-});
+}));
 
 /*
 GET /bookings/id
 curl -X GET -H "Content-Type: application/json" \
     localhost:3000/bookings/id
 */
-router.get('/bookings/:id', async (req, res) => {
+router.get('/bookings/:id', asyncHandler(async (req, res) => {
   const [booking] = await knex('bookings')
     .where({
       id: req.params.id,
@@ -55,7 +59,7 @@ router.get('/bookings/:id', async (req, res) => {
   if (!booking) return res.status(404).send({ type: 'error', reason: 'NOT_FOUND_ERROR', message: 'BOOKING_NOT_FOUND' });
 
   return res.status(200).send(booking);
-});
+}));
 
 /*
 PUT /bookings/:id
@@ -63,7 +67,7 @@ curl -X PUT -H "Content-Type: application/json" \
     -d '{"personName": "Bobby"}' \
     localhost:3000/bookings/1
 */
-router.put('/bookings/:id', async (req, res) => {
+router.put('/bookings/:id', asyncHandler(async (req, res) => {
   const errors = [];
   const {
     personName,
@@ -104,14 +108,14 @@ router.put('/bookings/:id', async (req, res) => {
   if (!updatedBooking) { return res.status(404).send({ type: 'error', reason: 'NOT_FOUND_ERROR' }); }
 
   return res.status(200).send(keysToCamel(updatedBooking));
-});
+}));
 
 /*
 DEL /bookings/id
 curl -X DELETE -H "Content-Type: application/json" \
     localhost:3000/bookings/7dfddd85-fa8b-49e8-a7de-ac623b4da4a2
 */
-router.delete('/bookings/:id', async (req, res) => {
+router.delete('/bookings/:id', asyncHandler(async (req, res) => {
   const deletedBooking = await knex('bookings')
     .where({
       id: req.params.id,
@@ -123,7 +127,7 @@ router.delete('/bookings/:id', async (req, res) => {
   return res.status(200).send({
     id: req.params.id,
   });
-});
+}));
 
 /*
 POST /bookings
@@ -131,7 +135,7 @@ curl -X POST -H "Content-Type: application/json" \
     -d '{"personName": "FooBar","peopleNumber":4,"date":"2021-10-10","tableNumber":42}' \
     localhost:3000/bookings
 */
-router.post('/bookings/', async (req, res) => {
+router.post('/bookings/', asyncHandler(async (req, res) => {
   const errors = [];
   const {
     personName,
@@ -165,6 +169,6 @@ router.post('/bookings/', async (req, res) => {
   const [insertedBooking] = await knex('bookings').insert(params, ['*']);
 
   return res.status(201).send(keysToCamel(insertedBooking));
-});
+}));
 
 module.exports = router;
