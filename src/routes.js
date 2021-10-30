@@ -181,7 +181,7 @@ router.post('/bookings/', asyncHandler(async (req, res) => {
   if (date && Number.isNaN(Date.parse(date))) errors.push({ date: 'BAD_FORMAT' });
   if (typeof tableNumber === 'undefined' || tableNumber === null) { errors.push({ tableNumber: 'REQUIRED' }); }
   if (typeof openedStatus === 'undefined' || openedStatus === null) { errors.push({ openedStatus: 'REQUIRED' }); }
-  if (typeof totalBilled !== 'undefined' && !Number.isInteger(totalBilled)) { errors.push({ totalBilled: 'BAD_FORMAT' }); }
+  if (typeof totalBilled !== 'undefined' && totalBilled && !Number.isInteger(totalBilled)) { errors.push({ totalBilled: 'BAD_FORMAT' }); }
 
   if (errors.length > 0) { return res.status(422).send({ type: 'error', reason: 'VALIDATION_ERROR', errors }); }
 

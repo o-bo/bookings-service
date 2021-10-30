@@ -150,6 +150,7 @@ describe('testing-server-routes', () => {
       date: '2021-10-10',
       tableNumber: 42,
       openedStatus: false,
+      totalBilled: null,
     };
     const { status, body } = await request(app).post('/bookings').send(params);
     expect(status).toEqual(201);
