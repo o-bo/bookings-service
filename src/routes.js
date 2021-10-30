@@ -29,9 +29,21 @@ curl -X GET -H "Content-Type: application/json" \
 router.get('/bookings/', asyncHandler(async (req, res) => {
   const { date, tableNumber, openedStatus } = req.query;
 
-  if (!date) return res.status(400).send({ type: 'error', reason: 'REQUIRED_ERROR', message: 'DATE_MANDATORY' });
+  if (!date) {
+    return res.status(400).send({
+      type: 'error',
+      reason: 'REQUIRED_ERROR',
+      message: 'DATE_MANDATORY',
+    });
+  }
 
-  if (Number.isNaN(Date.parse(date))) { return res.status(422).send({ type: 'error', reason: 'VALIDATION_ERROR', message: 'DATE_BAD_FORMAT' }); }
+  if (Number.isNaN(Date.parse(date))) {
+    return res.status(422).send({
+      type: 'error',
+      reason: 'VALIDATION_ERROR',
+      message: 'DATE_BAD_FORMAT',
+    });
+  }
 
   const bookings = await knex('bookings')
     .where({
@@ -56,7 +68,13 @@ router.get('/bookings/:id', asyncHandler(async (req, res) => {
     })
     .select();
 
-  if (!booking) return res.status(404).send({ type: 'error', reason: 'NOT_FOUND_ERROR', message: 'BOOKING_NOT_FOUND' });
+  if (!booking) {
+    return res.status(404).send({
+      type: 'error',
+      reason: 'NOT_FOUND_ERROR',
+      message: 'BOOKING_NOT_FOUND',
+    });
+  }
 
   return res.status(200).send(booking);
 }));
@@ -105,7 +123,12 @@ router.put('/bookings/:id', asyncHandler(async (req, res) => {
     })
     .update(params, ['*']);
 
-  if (!updatedBooking) { return res.status(404).send({ type: 'error', reason: 'NOT_FOUND_ERROR' }); }
+  if (!updatedBooking) {
+    return res.status(404).send({
+      type: 'error',
+      reason: 'NOT_FOUND_ERROR',
+    });
+  }
 
   return res.status(200).send(keysToCamel(updatedBooking));
 }));
@@ -122,7 +145,13 @@ router.delete('/bookings/:id', asyncHandler(async (req, res) => {
     })
     .delete();
 
-  if (deletedBooking === 0) { return res.status(404).send({ type: 'error', reason: 'NOT_FOUND_ERROR', message: 'BOOKING_NOT_FOUND' }); }
+  if (deletedBooking === 0) {
+    return res.status(404).send({
+      type: 'error',
+      reason: 'NOT_FOUND_ERROR',
+      message: 'BOOKING_NOT_FOUND',
+    });
+  }
 
   return res.status(200).send({
     id: req.params.id,
