@@ -1,11 +1,13 @@
 /* global beforeEach describe it expect */
-const request = require('supertest');
-const { v4 } = require('uuid');
-const knex = require('knex')(
-  require('../../db/knexfile')[process.env.NODE_ENV || 'test'],
-);
+import request from 'supertest';
+import { v4 } from 'uuid';
+import { knex } from 'knex';
 
-const app = require('../app');
+import dbConfig from '../db/knexfile';
+
+import app from '../app';
+
+const db = knex(dbConfig);
 
 const BOOKING_PARAMS = {
   id: v4(),
@@ -13,134 +15,141 @@ const BOOKING_PARAMS = {
   people_number: 4,
   date: '2021-10-10',
   table_number: 42,
-  opened_status: false,
+  opened_status: false
 };
 
-beforeEach(() => knex.raw('truncate table bookings cascade'));
+beforeEach(() => db.raw('truncate table bookings cascade'));
 
 describe('testing-server-routes', () => {
   it('GET /health - success', async () => {
     const { status, body } = await request(app).get('/health');
     expect(status).toEqual(200);
     expect(body).toEqual({
-      status: 'ok',
+      status: 'ok'
     });
   });
 
   it('GET /bookings/:id - success', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
     const { status, body } = await request(app).get(
-      `/bookings/${BOOKING_PARAMS.id}`,
+      `/bookings/${BOOKING_PARAMS.id}`
     );
     expect(status).toEqual(200);
     expect(body).toMatchObject(BOOKING_PARAMS);
   });
 
   it('GET /bookings/:id - fail - unkown id', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
     const { status, body } = await request(app).get(`/bookings/${v4()}`);
     expect(status).toEqual(404);
     expect(body).toEqual({
       message: 'BOOKING_NOT_FOUND',
       type: 'error',
-      reason: 'NOT_FOUND_ERROR',
+      reason: 'NOT_FOUND_ERROR'
     });
   });
 
   it('GET /bookings - fail - no date passed', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
     const { status, body } = await request(app).get('/bookings');
     expect(status).toEqual(400);
     expect(body).toEqual({
       message: 'DATE_MANDATORY',
       type: 'error',
-      reason: 'REQUIRED_ERROR',
+      reason: 'REQUIRED_ERROR'
     });
   });
 
   it('GET /bookings - fail - bad date format', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
     const { status, body } = await request(app).get('/bookings?date=erzere');
     expect(status).toEqual(422);
     expect(body).toEqual({
       message: 'DATE_BAD_FORMAT',
       type: 'error',
-      reason: 'VALIDATION_ERROR',
+      reason: 'VALIDATION_ERROR'
     });
   });
 
   it('GET /bookings - success - date only', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
-    await knex('bookings').insert(
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(
       { ...BOOKING_PARAMS, id: v4(), date: '2021-09-09' },
-      ['*'],
+      ['*']
     );
     const { status, body } = await request(app).get(
-      '/bookings?date=2021-10-10',
+      '/bookings?date=2021-10-10'
     );
     expect(status).toEqual(200);
     expect(body).toMatchObject([BOOKING_PARAMS]);
   });
 
   it('GET /bookings - success - date + table number', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
-    await knex('bookings').insert(
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(
       { ...BOOKING_PARAMS, id: v4(), table_number: 666 },
-      ['*'],
+      ['*']
     );
     const { status, body } = await request(app).get(
-      '/bookings?date=2021-10-10&tableNumber=42',
+      '/bookings?date=2021-10-10&tableNumber=42'
     );
     expect(status).toEqual(200);
     expect(body).toMatchObject([BOOKING_PARAMS]);
   });
 
   it('GET /bookings - success - date + opened status', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
-    await knex('bookings').insert(
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(
       { ...BOOKING_PARAMS, id: v4(), opened_status: true },
-      ['*'],
+      ['*']
     );
     const { status, body } = await request(app).get(
-      '/bookings?date=2021-10-10&openedStatus=false',
+      '/bookings?date=2021-10-10&openedStatus=false'
     );
     expect(status).toEqual(200);
     expect(body).toMatchObject([BOOKING_PARAMS]);
   });
 
   it('GET /bookings - success - date + opened status + table number', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
-    await knex('bookings').insert(
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(
       { ...BOOKING_PARAMS, id: v4(), opened_status: true },
-      ['*'],
+      ['*']
     );
-    await knex('bookings').insert(
+    await db('bookings').insert(
       {
-        ...BOOKING_PARAMS, id: v4(), opened_status: true, table_number: 666,
+        ...BOOKING_PARAMS,
+        id: v4(),
+        opened_status: true,
+        table_number: 666
       },
-      ['*'],
+      ['*']
     );
     const { status, body } = await request(app).get(
-      '/bookings?date=2021-10-10&openedStatus=false&tableNumber=42',
+      '/bookings?date=2021-10-10&openedStatus=false&tableNumber=42'
     );
     expect(status).toEqual(200);
     expect(body).toMatchObject([BOOKING_PARAMS]);
   });
 
   it('DELETE /bookings/:id - success', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
     const { status, body } = await request(app).delete(
-      `/bookings/${BOOKING_PARAMS.id}`,
+      `/bookings/${BOOKING_PARAMS.id}`
     );
     expect(status).toEqual(200);
     expect(body.id).toEqual(BOOKING_PARAMS.id);
   });
 
   it('DELETE /bookings/:id - fail - unkown id', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
     const { status, body } = await request(app).delete(`/bookings/${v4()}`);
     expect(status).toEqual(404);
-    expect(body).toEqual({ type: 'error', reason: 'NOT_FOUND_ERROR', message: 'BOOKING_NOT_FOUND' });
+    expect(body).toEqual({
+      type: 'error',
+      reason: 'NOT_FOUND_ERROR',
+      message: 'BOOKING_NOT_FOUND'
+    });
   });
 
   it('POST /bookings - success', async () => {
@@ -150,7 +159,7 @@ describe('testing-server-routes', () => {
       date: '2021-10-10',
       tableNumber: 42,
       openedStatus: false,
-      totalBilled: null,
+      totalBilled: null
     };
     const { status, body } = await request(app).post('/bookings').send(params);
     expect(status).toEqual(201);
@@ -166,7 +175,7 @@ describe('testing-server-routes', () => {
       peopleNumber: null,
       date: null,
       tableNumber: null,
-      openedStatus: null,
+      openedStatus: null
     };
     const { status, body } = await request(app).post('/bookings').send(params);
     expect(status).toEqual(422);
@@ -177,7 +186,7 @@ describe('testing-server-routes', () => {
       { peopleNumber: 'REQUIRED' },
       { date: 'REQUIRED' },
       { tableNumber: 'REQUIRED' },
-      { openedStatus: 'REQUIRED' },
+      { openedStatus: 'REQUIRED' }
     ]);
   });
 
@@ -192,7 +201,7 @@ describe('testing-server-routes', () => {
       { peopleNumber: 'REQUIRED' },
       { date: 'REQUIRED' },
       { tableNumber: 'REQUIRED' },
-      { openedStatus: 'REQUIRED' },
+      { openedStatus: 'REQUIRED' }
     ]);
   });
 
@@ -202,7 +211,7 @@ describe('testing-server-routes', () => {
       peopleNumber: 4,
       date: 'dqsdqsdsqd',
       tableNumber: 42,
-      openedStatus: false,
+      openedStatus: false
     };
     const { status, body } = await request(app).post('/bookings').send(params);
     expect(status).toEqual(422);
@@ -218,7 +227,7 @@ describe('testing-server-routes', () => {
       date: '2021-10-10',
       tableNumber: 42,
       openedStatus: false,
-      totalBilled: 'lol',
+      totalBilled: 'lol'
     };
     const { status, body } = await request(app).post('/bookings').send(params);
     expect(status).toEqual(422);
@@ -228,13 +237,13 @@ describe('testing-server-routes', () => {
   });
 
   it('PUT /bookings/:id - success', async () => {
-    const [{ id, created_at: createdAt }] = await knex('bookings').insert(
+    const [{ id, created_at: createdAt }] = await db('bookings').insert(
       BOOKING_PARAMS,
-      ['*'],
+      ['*']
     );
     const params = {
       personName: 'fooBar',
-      peopleNumber: 3,
+      peopleNumber: 3
     };
     const { status, body } = await request(app)
       .put(`/bookings/${id}`)
@@ -245,13 +254,13 @@ describe('testing-server-routes', () => {
   });
 
   it('PUT /bookings/:id - fail - required data null', async () => {
-    const [{ id }] = await knex('bookings').insert(BOOKING_PARAMS, ['*']);
+    const [{ id }] = await db('bookings').insert(BOOKING_PARAMS, ['*']);
     const params = {
       personName: null,
       peopleNumber: null,
       date: null,
       tableNumber: null,
-      openedStatus: null,
+      openedStatus: null
     };
     const { status, body } = await request(app)
       .put(`/bookings/${id}`)
@@ -264,18 +273,18 @@ describe('testing-server-routes', () => {
       { peopleNumber: 'REQUIRED' },
       { date: 'REQUIRED' },
       { tableNumber: 'REQUIRED' },
-      { openedStatus: 'REQUIRED' },
+      { openedStatus: 'REQUIRED' }
     ]);
   });
 
   it('PUT /bookings/:id - fail - bad date format', async () => {
-    const [{ id }] = await knex('bookings').insert(BOOKING_PARAMS, ['*']);
+    const [{ id }] = await db('bookings').insert(BOOKING_PARAMS, ['*']);
     const params = {
       personName: 'foo',
       peopleNumber: 4,
       date: 'dqsdqsdsqd',
       tableNumber: 42,
-      openedStatus: false,
+      openedStatus: false
     };
     const { status, body } = await request(app)
       .put(`/bookings/${id}`)
@@ -287,14 +296,14 @@ describe('testing-server-routes', () => {
   });
 
   it('PUT /bookings/:id - fail - bad billed amount format', async () => {
-    const [{ id }] = await knex('bookings').insert(BOOKING_PARAMS, ['*']);
+    const [{ id }] = await db('bookings').insert(BOOKING_PARAMS, ['*']);
     const params = {
       personName: 'foo',
       peopleNumber: 4,
       date: '2021-10-10',
       tableNumber: 42,
       openedStatus: false,
-      totalBilled: 'lol',
+      totalBilled: 'lol'
     };
     const { status, body } = await request(app)
       .put(`/bookings/${id}`)
@@ -306,13 +315,13 @@ describe('testing-server-routes', () => {
   });
 
   it('PUT /bookings/:id - fail - unkown id', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
     const params = {
       personName: 'foo',
       peopleNumber: 4,
       date: '2021-10-10',
       tableNumber: 42,
-      openedStatus: false,
+      openedStatus: false
     };
     const { status, body } = await request(app)
       .put(`/bookings/${v4()}`)
@@ -323,13 +332,13 @@ describe('testing-server-routes', () => {
   });
 
   it('PUT /bookings/:id - fail - bad id', async () => {
-    await knex('bookings').insert(BOOKING_PARAMS, ['*']);
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
     const params = {
       personName: 'foo',
       peopleNumber: 4,
       date: '2021-10-10',
       tableNumber: 42,
-      openedStatus: false,
+      openedStatus: false
     };
     const { status, body } = await request(app)
       .put('/bookings/foobar')
