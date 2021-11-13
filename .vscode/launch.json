@@ -5,21 +5,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "program": "${workspaceFolder}/bin/www",
-      "env": {
-        "NODE_ENV": "local"
-      }
+      "name": "Debug Program",
+      "program": "${workspaceFolder}/src/infrastructure/http/index.ts",
+      "preLaunchTask": "npm: build",
+      "outFiles": ["${workspaceFolder}/build/**/*.js"]
     },
     {
       "type": "pwa-node",
       "request": "launch",
-      "name": "Launch Tests",
+      "name": "Debug Tests",
       "skipFiles": [
         "<node_internals>/**"
       ],

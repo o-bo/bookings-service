@@ -1,26 +1,24 @@
-import express from 'express';
-import { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import { v4, validate } from 'uuid';
-import { knex } from 'knex';
+import { Knex, knex } from 'knex';
 import { types } from 'pg';
 
 /* Fix : Override date parser to avoid returning a full ISO8061 string representation https://github.com/knex/knex/issues/3071 */
 const DATE_OID = 1082;
-const parseDate = (value: any): any => value;
+const parseDate = (value: string): any => value;
 types.setTypeParser(DATE_OID, parseDate);
 /* /Fix */
 
-import dbConfig from './db/knexfile';
+import dbConfig from '../storage/postgres/knexfile';
 
-import { keysToCamel } from './utils';
+import { keysToCamel } from '../../shared/utils';
 
-const db: any = knex(dbConfig);
+const db: Knex = knex(dbConfig);
 
-const router = express.Router();
+const router: Router = express.Router();
 
-const asyncHandler =
-  (fn: any) => (req: Request, res: Response, next: any) =>
-    Promise.resolve(fn(req, res, next)).catch(next);
+const asyncHandler = (fn: any) => (req: Request, res: Response, next: any) =>
+  Promise.resolve(fn(req, res, next)).catch(next);
 
 /* GET /health */
 router.get('/health', async (req: Request, res: Response) =>
@@ -148,11 +146,11 @@ router.put(
       ...(totalBilled && { total_billed: totalBilled })
     };
 
-    const [updatedBooking] = await db('bookings')
+    const [updatedBooking] = (await db('bookings')
       .where({
         id
       })
-      .update(params, ['*']);
+      .update(params, ['*'])) as unknown as Array<any>;
 
     if (!updatedBooking) {
       return res.status(404).send({
@@ -253,7 +251,9 @@ router.post(
       ...(totalBilled && { total_billed: totalBilled })
     };
 
-    const [insertedBooking] = await db('bookings').insert(params, ['*']);
+    const [insertedBooking] = (await db('bookings').insert(params, [
+      '*'
+    ])) as unknown as Array<any>;
 
     return res.status(201).send(keysToCamel(insertedBooking));
   })

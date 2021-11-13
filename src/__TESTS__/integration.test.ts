@@ -3,9 +3,9 @@ import request from 'supertest';
 import { v4 } from 'uuid';
 import { knex } from 'knex';
 
-import dbConfig from '../db/knexfile';
+import dbConfig from '../infrastructure/storage/postgres/knexfile';
 
-import app from '../app';
+import app from '../infrastructure/http/app';
 
 const db = knex(dbConfig);
 

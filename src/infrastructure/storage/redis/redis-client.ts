@@ -1,6 +1,6 @@
 // redis-client.js
-const redis = require('redis');
-const { promisify } = require('util');
+import redis from 'redis';
+import { promisify } from 'util';
 
 const client = redis.createClient();
 client.on('error', (err) => {
@@ -13,6 +13,7 @@ client.on('connect', () => {
 const getAsync = promisify(client.get).bind(client);
 // Set a TTL : client.set(key, value, 'EX', 60 * 60 * 24, callback);
 const setAsync = promisify(client.set).bind(client);
+const expireAsync = promisify(client.expire).bind(client);
 const delAsync = promisify(client.del).bind(client);
 // NOTE : do not use keys in production :
 // it might block the redis server ; see SCAN documentation instead
@@ -29,23 +30,32 @@ const delAsync = promisify(client.del).bind(client);
  *
  * Example : <namespace>:<k1>:<v1>:<k2>:<v2>
  */
-const getCacheKey = (namespace, params) => {
-  const paramsEntries = Object.entries(params).sort(([k1], [k2]) => (k1 < k2 ? -1 : 1));
-  const cacheKey = paramsEntries.reduce((acc, [k, v]) => `${acc}:${k}:${v}`, namespace);
+const getCacheKey = (namespace: string, params: any) => {
+  const paramsEntries = Object.entries(params).sort(([k1], [k2]) =>
+    k1 < k2 ? -1 : 1
+  );
+  const cacheKey = paramsEntries.reduce(
+    (acc, [k, v]) => `${acc}:${k}:${v}`,
+    namespace
+  );
   return cacheKey;
 };
 
-module.exports = {
-  retrieve: (namespace, params) => {
-    const cacheKey = getCacheKey(namespace, params);
-    return getAsync(cacheKey).then((result) => result && JSON.parse(result)).catch(() => null);
-  },
-  cache: async (namespace, params, data) => {
-    const cacheKey = getCacheKey(namespace, params);
-    return setAsync(cacheKey, JSON.stringify(data), 'EX', 2).then(() => 1).catch(() => 0);
-  },
-  delete: (namespace, params) => {
-    const cacheKey = getCacheKey(namespace, params);
-    return delAsync(cacheKey).then(() => 1).catch(() => 0);
-  },
-};
+export function retrieve(namespace: string, params: any): Promise<any> {
+  const cacheKey = getCacheKey(namespace, params);
+  return getAsync(cacheKey)
+    .then((result) => result && JSON.parse(result))
+    .catch(() => null);
+}
+
+export function cache(
+  namespace: string,
+  params: any,
+  data: any
+): Promise<number> {
+  const cacheKey = getCacheKey(namespace, params);
+  return setAsync(cacheKey, JSON.stringify(data))
+    .then(() => expireAsync(cacheKey, 2))
+    .then(() => 1)
+    .catch(() => 0);
+}
