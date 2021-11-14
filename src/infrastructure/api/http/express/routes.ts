@@ -1,12 +1,14 @@
 import express, { Request, Response, Router } from 'express';
 import { validate } from 'uuid';
 
-import db from '../../spi/storage/postgres';
+import { keysToCamel } from '../../../../shared/utils';
 
-import createBookingUseCase from '../../../core/bookings/useCases/createBooking';
-import CreateBookingDTO from '../../../core/bookings/useCases/createBooking/CreateBookingDTO';
+import db from '../../../spi/storage/postgres';
 
-import { keysToCamel } from '../../../shared/utils';
+import createBookingUseCase from '../../../../core/bookings/useCases/createBooking';
+import CreateBookingController from '../../../../core/bookings/useCases/createBooking/CreateBookingController';
+
+import BaseController from './BaseController';
 
 const router: Router = express.Router();
 
@@ -193,19 +195,10 @@ curl -X POST -H "Content-Type: application/json" \
 router.post(
   '/bookings/',
   asyncHandler(async (req: Request, res: Response) => {
-    const createBookingDto: CreateBookingDTO = req.body as CreateBookingDTO;
-
-    const createdBookingOrError = await createBookingUseCase.execute(
-      createBookingDto
+    const controller: BaseController = new CreateBookingController(
+      createBookingUseCase
     );
-
-    if (createdBookingOrError.type === 'error') {
-      return res
-        .status(createdBookingOrError.reason === 'VALIDATION_ERROR' ? 422 : 400)
-        .send(createdBookingOrError);
-    }
-
-    return res.status(201).send(keysToCamel(createdBookingOrError));
+    return controller.execute(req, res);
   })
 );
 

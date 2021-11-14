@@ -4,17 +4,17 @@ import { promisify } from 'util';
 
 const client = redis.createClient();
 client.on('error', (err) => {
-  // console.log('Redis Client Error', err);
+  console.log('Redis Client Error', err);
 });
 client.on('connect', () => {
-  // console.log('Connected!');
+  console.log('Connected!');
 });
 
 const getAsync = promisify(client.get).bind(client);
 // Set a TTL : client.set(key, value, 'EX', 60 * 60 * 24, callback);
 const setAsync = promisify(client.set).bind(client);
 const expireAsync = promisify(client.expire).bind(client);
-const delAsync = promisify(client.del).bind(client);
+// const delAsync = promisify(client.del).bind(client);
 // NOTE : do not use keys in production :
 // it might block the redis server ; see SCAN documentation instead
 // keysAsync: promisify(client.keys).bind(client),

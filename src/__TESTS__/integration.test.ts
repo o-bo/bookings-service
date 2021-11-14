@@ -5,7 +5,7 @@ import { knex } from 'knex';
 
 import dbConfig from '../infrastructure/spi/storage/postgres/knexfile';
 
-import app from '../infrastructure/api/http/app';
+import app from '../infrastructure/api/http/express';
 
 const db = knex(dbConfig);
 

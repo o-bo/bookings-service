@@ -5,7 +5,7 @@
  */
 
 import http from 'http';
-import app from './app';
+import app from './express';
 
 /**
  * Normalize a port into a number, string, or false.

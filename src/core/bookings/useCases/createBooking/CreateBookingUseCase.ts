@@ -1,19 +1,25 @@
 import { v4 } from 'uuid';
 
+import { GenericAppError } from '../../../GenericAppError';
 import IUseCase from '../../../IUseCase';
+import { Result, left, right } from '../../../UseCaseResult';
 
 import IBookingRepository from '../../repositories/IBookingRepository';
 
 import CreateBookingDTO from './CreateBookingDTO';
+import { InvalidBookingError } from './CreateBookingErrors';
+import { CreateBookingResponse } from './CreateBookingResponse';
 
-export default class CreateBookingUseCase implements IUseCase<any, Promise<any>> {
+export default class CreateBookingUseCase
+  implements IUseCase<CreateBookingDTO, Promise<CreateBookingResponse>>
+{
   private repository: IBookingRepository;
 
   constructor(repository: IBookingRepository) {
     this.repository = repository;
   }
 
-  async execute(request: CreateBookingDTO): Promise<any> {
+  async execute(request: CreateBookingDTO): Promise<CreateBookingResponse> {
     const errors = [];
     const {
       personName,
@@ -48,11 +54,7 @@ export default class CreateBookingUseCase implements IUseCase<any, Promise<any>>
     }
 
     if (errors.length > 0) {
-      return {
-        type: 'error',
-        reason: 'VALIDATION_ERROR',
-        errors
-      };
+      return left(new InvalidBookingError(errors)) as CreateBookingResponse;
     }
 
     const params = {
@@ -65,6 +67,14 @@ export default class CreateBookingUseCase implements IUseCase<any, Promise<any>>
       ...(totalBilled && { total_billed: totalBilled })
     };
 
-    return this.repository.save(params);
+    try {
+      const createdBooking = await this.repository.save(params);
+
+      return right(Result.ok<any>(createdBooking));
+    } catch (err) {
+      return left(
+        new GenericAppError.UnexpectedError(err)
+      ) as CreateBookingResponse;
+    }
   }
 }

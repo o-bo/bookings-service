@@ -1,4 +1,4 @@
-export function isArray(a: any): boolean{ 
+export function isArray(a: any): boolean {
   return Array.isArray(a);
 }
 
@@ -35,7 +35,7 @@ export function keysToCamel(o: any): any {
   }
 
   return o;
-};
+}
 
 export function keysToSnake(o: any): any {
   if (isObject(o)) {
@@ -53,9 +53,9 @@ export function keysToSnake(o: any): any {
   }
 
   return o;
-};
+}
 
-export function sleep (ms: number) {
+export function sleep(ms: number) {
   new Promise((resolve) => {
     setTimeout(resolve, ms);
   });

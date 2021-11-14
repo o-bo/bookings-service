@@ -9,7 +9,15 @@
     "airbnb-typescript",
     "prettier"
   ],
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "project": ["tsconfig.json"] ,
+    "sourceType": "module"
+  },
   "rules": {
+    "import/extensions": 0,
+    "import/no-extraneous-dependencies": 0,
+    "react/jsx-filename-extension": 0,
     "prettier/prettier": 2 // Means error
   }
 }

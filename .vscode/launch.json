@@ -23,6 +23,24 @@
       "env": {
         "NODE_ENV": "test"
       }
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Debug Integration Tests",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "args": [
+        "--forceExit",
+        "--runInBand",
+        "--", 
+        "integration.test.ts"
+      ],
+      "env": {
+        "NODE_ENV": "test"
+      }
     }
   ]
 }
