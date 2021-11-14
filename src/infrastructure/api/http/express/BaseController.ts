@@ -1,6 +1,6 @@
 import * as express from 'express';
 
-export default abstract class BaseController {
+export default abstract class BaseController<DTO> {
   // or even private
   protected req!: express.Request;
 
@@ -26,11 +26,11 @@ export default abstract class BaseController {
     return result ? res.status(code).json(result) : res.sendStatus(code);
   }
 
-  public ok<T>(dto?: T) {
+  public ok(dto?: DTO) {
     return BaseController.jsonResponse(this.res, 200, dto);
   }
 
-  public created<T>(dto?: T) {
+  public created(dto?: DTO) {
     return BaseController.jsonResponse(this.res, 201, dto);
   }
 

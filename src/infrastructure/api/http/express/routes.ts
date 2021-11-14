@@ -7,6 +7,7 @@ import db from '../../../spi/storage/postgres';
 
 import createBookingUseCase from '../../../../core/bookings/useCases/createBooking';
 import CreateBookingController from '../../../../core/bookings/useCases/createBooking/CreateBookingController';
+import CreateBookingDTO from '../../../../core/bookings/useCases/createBooking/CreateBookingDTO';
 
 import BaseController from './BaseController';
 
@@ -195,9 +196,9 @@ curl -X POST -H "Content-Type: application/json" \
 router.post(
   '/bookings/',
   asyncHandler(async (req: Request, res: Response) => {
-    const controller: BaseController = new CreateBookingController(
-      createBookingUseCase
-    );
+    const controller: BaseController<CreateBookingDTO> =
+      new CreateBookingController(createBookingUseCase);
+
     return controller.execute(req, res);
   })
 );

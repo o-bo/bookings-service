@@ -6,7 +6,9 @@ import IUseCase from '../../../IUseCase';
 import CreateBookingDTO from './CreateBookingDTO';
 import { InvalidBookingError } from './CreateBookingErrors';
 
-export default class CreateBookingController extends BaseController {
+export default class CreateBookingController extends BaseController<CreateBookingDTO> {
+  // we cannot type the result like in the use case, like this :
+  // private useCase: IUseCase<CreateBookingDTO, Promise<CreateBookingResponse>>;
   private useCase: IUseCase<CreateBookingDTO, any>;
 
   constructor(useCase: IUseCase<CreateBookingDTO, any>) {
@@ -33,7 +35,7 @@ export default class CreateBookingController extends BaseController {
         }
       }
 
-      // If we type the result, it will be of type 'never' here and compilation will fail
+      // If we type the use case or the result, it will be of type 'never' here and compilation will fail
       return this.created(keysToCamel(result.value.getValue()));
     } catch (err: any) {
       return this.fail(err);
