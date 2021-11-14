@@ -1,19 +1,12 @@
 import express, { Request, Response, Router } from 'express';
-import { v4, validate } from 'uuid';
-import { Knex, knex } from 'knex';
-import { types } from 'pg';
+import { validate } from 'uuid';
 
-/* Fix : Override date parser to avoid returning a full ISO8061 string representation https://github.com/knex/knex/issues/3071 */
-const DATE_OID = 1082;
-const parseDate = (value: string): any => value;
-types.setTypeParser(DATE_OID, parseDate);
-/* /Fix */
+import db from '../../spi/storage/postgres';
 
-import dbConfig from '../storage/postgres/knexfile';
+import createBookingUseCase from '../../../core/bookings/useCases/createBooking';
+import CreateBookingDTO from '../../../core/bookings/useCases/createBooking/CreateBookingDTO';
 
-import { keysToCamel } from '../../shared/utils';
-
-const db: Knex = knex(dbConfig);
+import { keysToCamel } from '../../../shared/utils';
 
 const router: Router = express.Router();
 
@@ -200,62 +193,19 @@ curl -X POST -H "Content-Type: application/json" \
 router.post(
   '/bookings/',
   asyncHandler(async (req: Request, res: Response) => {
-    const errors = [];
-    const {
-      personName,
-      peopleNumber,
-      date,
-      tableNumber,
-      openedStatus,
-      totalBilled
-    } = req.body;
+    const createBookingDto: CreateBookingDTO = req.body as CreateBookingDTO;
 
-    if (typeof personName === 'undefined' || !personName) {
-      errors.push({ personName: 'REQUIRED' });
-    }
-    if (typeof peopleNumber === 'undefined' || !peopleNumber) {
-      errors.push({ peopleNumber: 'REQUIRED' });
-    }
-    if (typeof date === 'undefined' || !date) errors.push({ date: 'REQUIRED' });
-    if (date && Number.isNaN(Date.parse(date)))
-      errors.push({ date: 'BAD_FORMAT' });
-    if (typeof tableNumber === 'undefined' || tableNumber === null) {
-      errors.push({ tableNumber: 'REQUIRED' });
-    }
-    if (typeof openedStatus === 'undefined' || openedStatus === null) {
-      errors.push({ openedStatus: 'REQUIRED' });
-    }
-    if (
-      typeof totalBilled !== 'undefined' &&
-      totalBilled &&
-      !Number.isInteger(totalBilled)
-    ) {
-      errors.push({ totalBilled: 'BAD_FORMAT' });
+    const createdBookingOrError = await createBookingUseCase.execute(
+      createBookingDto
+    );
+
+    if (createdBookingOrError.type === 'error') {
+      return res
+        .status(createdBookingOrError.reason === 'VALIDATION_ERROR' ? 422 : 400)
+        .send(createdBookingOrError);
     }
 
-    if (errors.length > 0) {
-      return res.status(422).send({
-        type: 'error',
-        reason: 'VALIDATION_ERROR',
-        errors
-      });
-    }
-
-    const params = {
-      id: v4(),
-      ...(personName && { person_name: personName }),
-      ...(peopleNumber && { people_number: peopleNumber }),
-      ...(date && { date }),
-      ...(tableNumber && { table_number: tableNumber }),
-      ...(openedStatus && { opened_status: openedStatus }),
-      ...(totalBilled && { total_billed: totalBilled })
-    };
-
-    const [insertedBooking] = (await db('bookings').insert(params, [
-      '*'
-    ])) as unknown as Array<any>;
-
-    return res.status(201).send(keysToCamel(insertedBooking));
+    return res.status(201).send(keysToCamel(createdBookingOrError));
   })
 );
 

@@ -6,7 +6,7 @@
     "lint": "eslint . --ext .ts",
     "lint-and-fix": "eslint . --ext .ts --fix",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
-    "start": "npm run build && node build/infrastructure/http/index.js",
+    "start": "npm run build && node build/infrastructure/api/http/index.js",
     "build": "rimraf ./coverage && rimraf ./build && tsc",
     "start:dev": "nodemon",
     "prestart:dev": "npm run knex:migrate:latest",
@@ -14,9 +14,9 @@
     "test": "NODE_ENV=test jest --testPathIgnorePatterns=\"integration.test.(j|t)s\" --watchAll",
     "integrationTests": "NODE_ENV=test npm run pretest && jest --forceExit --runInBand -- integration.test.ts",
     "pretest": "NODE_ENV=test npm run knex:migrate:latest",
-    "knex:migrate:make": "knex --knexfile src/infrastructure/storage/postgres/knexfile.ts migrate:make -x ts",
-    "knex:migrate:latest": "knex --knexfile src/infrastructure/storage/postgres/knexfile.ts migrate:latest",
-    "knex:migrate:rollback": "knex --knexfile src/infrastructure/storage/postgres/knexfile.ts migrate:rollback"
+    "knex:migrate:make": "knex --knexfile src/infrastructure/spi/storage/postgres/knexfile.ts migrate:make -x ts",
+    "knex:migrate:latest": "knex --knexfile src/infrastructure/spi/storage/postgres/knexfile.ts migrate:latest",
+    "knex:migrate:rollback": "knex --knexfile src/infrastructure/spi/storage/postgres/knexfile.ts migrate:rollback"
   },
   "dependencies": {
     "express": "~4.16.1",
