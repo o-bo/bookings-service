@@ -74,6 +74,10 @@ export class Left<L, A> {
   isRight(): this is Right<L, A> {
     return false;
   }
+
+  cata(fnLeft: (v: L) => any) {
+    return fnLeft(this.value);
+  }
 }
 
 export class Right<L, A> {
@@ -89,6 +93,10 @@ export class Right<L, A> {
 
   isRight(): this is Right<L, A> {
     return true;
+  }
+
+  cata(_: (v: L) => any, fnRight: (v: A) => any) {
+    return fnRight(this.value);
   }
 }
 

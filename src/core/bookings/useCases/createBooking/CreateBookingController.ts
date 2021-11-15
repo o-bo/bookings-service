@@ -2,13 +2,13 @@ import BaseController from '../../../../infrastructure/api/http/express/BaseCont
 
 import { keysToCamel } from '../../../../shared/utils';
 import IUseCase from '../../../IUseCase';
+import { Result } from '../../../UseCaseResult';
 
 import CreateBookingDTO from './CreateBookingDTO';
-import { InvalidBookingError } from './CreateBookingErrors';
+import { CreateBookingError, InvalidBookingError } from './CreateBookingErrors';
+import { CreateBookingResponse } from './CreateBookingResponse';
 
 export default class CreateBookingController extends BaseController<CreateBookingDTO> {
-  // we cannot type the result like in the use case, like this :
-  // private useCase: IUseCase<CreateBookingDTO, Promise<CreateBookingResponse>>;
   private useCase: IUseCase<CreateBookingDTO, any>;
 
   constructor(useCase: IUseCase<CreateBookingDTO, any>) {
@@ -19,24 +19,22 @@ export default class CreateBookingController extends BaseController<CreateBookin
   async executeImpl(): Promise<any> {
     const dto: CreateBookingDTO = this.req.body as CreateBookingDTO;
 
-    try {
-      // we cannot type the result like this :
-      // const result: CreateBookingResponse = await this.useCase.execute(dto);
-      const result = await this.useCase.execute(dto);
-
-      if (result.isLeft()) {
-        const error = result.value;
-
-        switch (error.constructor) {
-          case InvalidBookingError:
-            return this.unprocessable(error.errorValue());
-          default:
-            return this.fail(error.errorValue());
-        }
+    const processError = (error: CreateBookingError) => {
+      switch (error.constructor) {
+        case InvalidBookingError:
+          return this.unprocessable(error.errorValue());
+        default:
+          return this.fail(error.errorValue());
       }
+    };
 
-      // If we type the use case or the result, it will be of type 'never' here and compilation will fail
-      return this.created(keysToCamel(result.value.getValue()));
+    const processResult = (useCaseResult: Result<any>) =>
+      this.created(keysToCamel(useCaseResult.getValue()));
+
+    try {
+      const result: CreateBookingResponse = await this.useCase.execute(dto);
+
+      return result.cata(processError, processResult);
     } catch (err: any) {
       return this.fail(err);
     }
