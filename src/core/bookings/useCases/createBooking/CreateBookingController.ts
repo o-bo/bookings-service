@@ -1,8 +1,9 @@
 import BaseController from '../../../../infrastructure/api/http/express/BaseController';
 
 import { keysToCamel } from '../../../../shared/utils';
-import IUseCase from '../../../IUseCase';
-import { Result } from '../../../UseCaseResult';
+
+import IUseCase from '../../../_shared/IUseCase';
+import Result from '../../../_shared/UseCaseResult';
 
 import CreateBookingDTO from './CreateBookingDTO';
 import { CreateBookingError, InvalidBookingError } from './CreateBookingErrors';

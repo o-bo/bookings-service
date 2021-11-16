@@ -1,14 +1,21 @@
 import { v4 } from 'uuid';
 
-import { GenericAppError } from '../../../GenericAppError';
-import IUseCase from '../../../IUseCase';
-import { Result, left, right } from '../../../UseCaseResult';
+import { GenericAppError } from '../../../_shared/GenericAppError';
+import IUseCase from '../../../_shared/IUseCase';
+import Result, { left, right } from '../../../_shared/UseCaseResult';
 
 import IBookingRepository from '../../repositories/IBookingRepository';
 
+import BookingPersonName from '../../domain/BookingPersonName';
+import BookingPeopleNumber from '../../domain/BookingPeopleNumber';
+import BookingDate from '../../domain/BookingDate';
+import BookingTableNumber from '../../domain/BookingTableNumber';
+import BookingOpenedStatus from '../../domain/BookingOpenedStatus';
+import BookingTotalBilled from '../../domain/BookingTotalBilled';
+
 import CreateBookingDTO from './CreateBookingDTO';
-import { InvalidBookingError } from './CreateBookingErrors';
 import { CreateBookingResponse } from './CreateBookingResponse';
+import { InvalidBookingError } from './CreateBookingErrors';
 
 export default class CreateBookingUseCase
   implements IUseCase<CreateBookingDTO, Promise<CreateBookingResponse>>
@@ -20,51 +27,46 @@ export default class CreateBookingUseCase
   }
 
   async execute(request: CreateBookingDTO): Promise<CreateBookingResponse> {
-    const errors = [];
-    const {
-      personName,
-      peopleNumber,
-      date,
-      tableNumber,
-      openedStatus,
-      totalBilled
-    } = request;
+    const personNameOrError: Result<BookingPersonName> =
+      BookingPersonName.create(request.personName);
 
-    if (typeof personName === 'undefined' || !personName) {
-      errors.push({ personName: 'REQUIRED' });
-    }
-    if (typeof peopleNumber === 'undefined' || !peopleNumber) {
-      errors.push({ peopleNumber: 'REQUIRED' });
-    }
-    if (typeof date === 'undefined' || !date) errors.push({ date: 'REQUIRED' });
-    if (date && Number.isNaN(Date.parse(date)))
-      errors.push({ date: 'BAD_FORMAT' });
-    if (typeof tableNumber === 'undefined' || tableNumber === null) {
-      errors.push({ tableNumber: 'REQUIRED' });
-    }
-    if (typeof openedStatus === 'undefined' || openedStatus === null) {
-      errors.push({ openedStatus: 'REQUIRED' });
-    }
-    if (
-      typeof totalBilled !== 'undefined' &&
-      totalBilled &&
-      !Number.isInteger(totalBilled)
-    ) {
-      errors.push({ totalBilled: 'BAD_FORMAT' });
-    }
+    const peopleNumberOrError: Result<BookingPeopleNumber> =
+      BookingPeopleNumber.create(request.peopleNumber);
 
-    if (errors.length > 0) {
-      return left(new InvalidBookingError(errors)) as CreateBookingResponse;
+    const dateOrError: Result<BookingDate> = BookingDate.create(request.date);
+
+    const tableNumberOrError: Result<BookingTableNumber> =
+      BookingTableNumber.create(request.tableNumber);
+
+    const openedStatusOrError: Result<BookingOpenedStatus> =
+      BookingOpenedStatus.create(request.openedStatus);
+
+    const totalBilledOrError: Result<BookingTotalBilled> =
+      BookingTotalBilled.create(request.totalBilled);
+
+    const combinedPropsResult = Result.combine([
+      personNameOrError,
+      peopleNumberOrError,
+      dateOrError,
+      tableNumberOrError,
+      openedStatusOrError,
+      totalBilledOrError
+    ]);
+
+    if (combinedPropsResult.isFailure) {
+      return left(
+        new InvalidBookingError(combinedPropsResult.error)
+      ) as CreateBookingResponse;
     }
 
     const params = {
-      id: v4(),
-      ...(personName && { person_name: personName }),
-      ...(peopleNumber && { people_number: peopleNumber }),
-      ...(date && { date }),
-      ...(tableNumber && { table_number: tableNumber }),
-      ...(openedStatus && { opened_status: openedStatus }),
-      ...(totalBilled && { total_billed: totalBilled })
+      id: v4()
+      // ...(personName && { person_name: personName }),
+      // ...(peopleNumber && { people_number: peopleNumber }),
+      // ...(date && { date }),
+      // ...(tableNumber && { table_number: tableNumber }),
+      // ...(openedStatus && { opened_status: openedStatus }),
+      // ...(totalBilled && { total_billed: totalBilled })
     };
 
     try {

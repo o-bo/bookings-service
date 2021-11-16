@@ -1,4 +1,4 @@
-import { Either, Result } from '../../../UseCaseResult';
+import Result, { Either } from '../../../_shared/UseCaseResult';
 
 import { CreateBookingError } from './CreateBookingErrors';
 

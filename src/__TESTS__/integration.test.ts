@@ -182,11 +182,11 @@ describe('testing-server-routes', () => {
     expect(body.type).toEqual('error');
     expect(body.reason).toEqual('VALIDATION_ERROR');
     expect(body.errors).toMatchObject([
-      { personName: 'REQUIRED' },
-      { peopleNumber: 'REQUIRED' },
-      { date: 'REQUIRED' },
-      { tableNumber: 'REQUIRED' },
-      { openedStatus: 'REQUIRED' }
+      'personName is required',
+      'peopleNumber is required',
+      'date is required',
+      'tableNumber is required',
+      'openedStatus is required'
     ]);
   });
 
@@ -197,11 +197,11 @@ describe('testing-server-routes', () => {
     expect(body.type).toEqual('error');
     expect(body.reason).toEqual('VALIDATION_ERROR');
     expect(body.errors).toMatchObject([
-      { personName: 'REQUIRED' },
-      { peopleNumber: 'REQUIRED' },
-      { date: 'REQUIRED' },
-      { tableNumber: 'REQUIRED' },
-      { openedStatus: 'REQUIRED' }
+      'personName is required',
+      'peopleNumber is required',
+      'date is required',
+      'tableNumber is required',
+      'openedStatus is required'
     ]);
   });
 
@@ -217,7 +217,7 @@ describe('testing-server-routes', () => {
     expect(status).toEqual(422);
     expect(body.type).toEqual('error');
     expect(body.reason).toEqual('VALIDATION_ERROR');
-    expect(body.errors).toMatchObject([{ date: 'BAD_FORMAT' }]);
+    expect(body.errors).toMatchObject(['date is not a date']);
   });
 
   it('POST /bookings - fail - bad billed amount format', async () => {
@@ -233,7 +233,7 @@ describe('testing-server-routes', () => {
     expect(status).toEqual(422);
     expect(body.type).toEqual('error');
     expect(body.reason).toEqual('VALIDATION_ERROR');
-    expect(body.errors).toMatchObject([{ totalBilled: 'BAD_FORMAT' }]);
+    expect(body.errors).toMatchObject(['totalBilled is not a number']);
   });
 
   it('PUT /bookings/:id - success', async () => {

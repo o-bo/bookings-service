@@ -1,4 +1,4 @@
-import { Result } from './UseCaseResult';
+import Result from './UseCaseResult';
 import UseCaseError, { UseCaseReasonError } from './UseCaseError';
 
 export namespace GenericAppError {

@@ -1,4 +1,4 @@
-export class Result<T> {
+export default class Result<T> {
   public isSuccess: boolean;
 
   public isFailure: boolean;
@@ -51,10 +51,15 @@ export class Result<T> {
   }
 
   public static combine(results: Result<any>[]): Result<any> {
+    const errors = [];
     for (let result of results) {
-      if (result.isFailure) return result;
+      if (result.isFailure) errors.push(result.errorValue());
     }
-    return Result.ok();
+    if (errors.length > 0) {
+      return Result.fail(errors);
+    } else {
+      return Result.ok();
+    }
   }
 }
 

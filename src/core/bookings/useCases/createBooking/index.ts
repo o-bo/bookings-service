@@ -1,4 +1,4 @@
-import IUseCase from '../../../IUseCase';
+import IUseCase from '../../../_shared/IUseCase';
 
 import bookingRepository from '../../repositories';
 

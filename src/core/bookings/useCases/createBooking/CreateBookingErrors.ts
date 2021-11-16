@@ -1,6 +1,8 @@
-import { GenericAppError } from '../../../GenericAppError';
-import UseCaseError, { UseCaseReasonError } from '../../../UseCaseError';
-import { Result } from '../../../UseCaseResult';
+import { GenericAppError } from '../../../_shared/GenericAppError';
+import UseCaseError, {
+  UseCaseReasonError
+} from '../../../_shared/UseCaseError';
+import Result from '../../../_shared/UseCaseResult';
 
 export class InvalidBookingError extends Result<UseCaseError> {
   constructor(errors: Array<any>) {
