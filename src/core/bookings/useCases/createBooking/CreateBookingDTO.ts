@@ -1,8 +1,11 @@
 export default interface CreateBookingDTO {
+  id?: string;
   personName: string;
-  peopleNumber: string;
+  peopleNumber: number;
   date: string;
   tableNumber: number;
   openedStatus: boolean;
-  totalBilled: number;
+  totalBilled?: number;
+  createdAt?: string;
+  uodatedAt?: string;
 }

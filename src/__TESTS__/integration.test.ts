@@ -185,8 +185,7 @@ describe('testing-server-routes', () => {
       'personName is required',
       'peopleNumber is required',
       'date is required',
-      'tableNumber is required',
-      'openedStatus is required'
+      'tableNumber is required'
     ]);
   });
 
@@ -200,8 +199,7 @@ describe('testing-server-routes', () => {
       'personName is required',
       'peopleNumber is required',
       'date is required',
-      'tableNumber is required',
-      'openedStatus is required'
+      'tableNumber is required'
     ]);
   });
 

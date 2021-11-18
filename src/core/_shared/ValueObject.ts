@@ -1,7 +1,7 @@
 import { shallowEqual } from 'shallow-equal-object';
 
 interface ValueObjectProps {
-  [index: string]: any;
+  [index: string]: any | null | undefined;
 }
 
 /**

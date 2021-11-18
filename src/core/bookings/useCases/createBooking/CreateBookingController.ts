@@ -1,9 +1,9 @@
 import BaseController from '../../../../infrastructure/api/http/express/BaseController';
 
-import { keysToCamel } from '../../../../shared/utils';
-
 import IUseCase from '../../../_shared/IUseCase';
 import Result from '../../../_shared/UseCaseResult';
+import Booking from '../../domain/Booking';
+import BookingMapper from '../../mappers/BookingMapper';
 
 import CreateBookingDTO from './CreateBookingDTO';
 import { CreateBookingError, InvalidBookingError } from './CreateBookingErrors';
@@ -29,8 +29,8 @@ export default class CreateBookingController extends BaseController<CreateBookin
       }
     };
 
-    const processResult = (useCaseResult: Result<any>) =>
-      this.created(keysToCamel(useCaseResult.getValue()));
+    const processResult = (useCaseResult: Result<Booking>) =>
+      this.created(BookingMapper.get().toDTO(useCaseResult.getValue()));
 
     try {
       const result: CreateBookingResponse = await this.useCase.execute(dto);

@@ -3,11 +3,11 @@ import Result from '../../_shared/UseCaseResult';
 import ValueObject from '../../_shared/ValueObject';
 
 interface BookingPeopleNumberProps {
-  value: string;
+  value: number;
 }
 
 export default class BookingPeopleNumber extends ValueObject<BookingPeopleNumberProps> {
-  get value(): string {
+  get value(): number {
     return this.props.value;
   }
 
@@ -15,11 +15,11 @@ export default class BookingPeopleNumber extends ValueObject<BookingPeopleNumber
     super(props);
   }
 
-  public static create(peopleNumber: string): Result<BookingPeopleNumber> {
-    const guardResult = Guard.againstNullOrUndefined(
-      peopleNumber,
-      'peopleNumber'
-    );
+  public static create(peopleNumber: number): Result<BookingPeopleNumber> {
+    const guardResult = Guard.combine([
+      Guard.againstNullOrUndefined(peopleNumber, 'peopleNumber'),
+      Guard.isNumber(peopleNumber, 'peopleNumber')
+    ]);
 
     if (!guardResult.succeeded) {
       return Result.fail<BookingPeopleNumber>(guardResult.message);

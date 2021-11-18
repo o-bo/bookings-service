@@ -1,16 +1,14 @@
-import { v4 } from 'uuid';
-
 import { GenericAppError } from '../../../_shared/GenericAppError';
 import IUseCase from '../../../_shared/IUseCase';
 import Result, { left, right } from '../../../_shared/UseCaseResult';
 
 import IBookingRepository from '../../repositories/IBookingRepository';
 
+import Booking from '../../domain/Booking';
 import BookingPersonName from '../../domain/BookingPersonName';
 import BookingPeopleNumber from '../../domain/BookingPeopleNumber';
 import BookingDate from '../../domain/BookingDate';
 import BookingTableNumber from '../../domain/BookingTableNumber';
-import BookingOpenedStatus from '../../domain/BookingOpenedStatus';
 import BookingTotalBilled from '../../domain/BookingTotalBilled';
 
 import CreateBookingDTO from './CreateBookingDTO';
@@ -38,9 +36,6 @@ export default class CreateBookingUseCase
     const tableNumberOrError: Result<BookingTableNumber> =
       BookingTableNumber.create(request.tableNumber);
 
-    const openedStatusOrError: Result<BookingOpenedStatus> =
-      BookingOpenedStatus.create(request.openedStatus);
-
     const totalBilledOrError: Result<BookingTotalBilled> =
       BookingTotalBilled.create(request.totalBilled);
 
@@ -49,7 +44,6 @@ export default class CreateBookingUseCase
       peopleNumberOrError,
       dateOrError,
       tableNumberOrError,
-      openedStatusOrError,
       totalBilledOrError
     ]);
 
@@ -59,18 +53,37 @@ export default class CreateBookingUseCase
       ) as CreateBookingResponse;
     }
 
-    const params = {
-      id: v4()
-      // ...(personName && { person_name: personName }),
-      // ...(peopleNumber && { people_number: peopleNumber }),
-      // ...(date && { date }),
-      // ...(tableNumber && { table_number: tableNumber }),
-      // ...(openedStatus && { opened_status: openedStatus }),
-      // ...(totalBilled && { total_billed: totalBilled })
-    };
+    const bookingOrError = Booking.create({
+      personName: personNameOrError.getValue(),
+      peopleNumber: peopleNumberOrError.getValue(),
+      date: dateOrError.getValue(),
+      tableNumber: tableNumberOrError.getValue(),
+      ...(totalBilledOrError.getValue() && {
+        totalBilled: totalBilledOrError.getValue()
+      }),
+      openedStatus: false
+    });
+
+    if (bookingOrError.isFailure) {
+      return left(
+        new InvalidBookingError(combinedPropsResult.error)
+      ) as CreateBookingResponse;
+    }
+
+    const booking: Booking = bookingOrError.getValue();
 
     try {
-      const createdBooking = await this.repository.save(params);
+      const createdBooking: Booking | null = await this.repository.save(
+        booking
+      );
+
+      if (!createdBooking) {
+        return left(
+          new GenericAppError.UnexpectedError(
+            'unable to save and return booking'
+          )
+        ) as CreateBookingResponse;
+      }
 
       return right(Result.ok<any>(createdBooking));
     } catch (err) {

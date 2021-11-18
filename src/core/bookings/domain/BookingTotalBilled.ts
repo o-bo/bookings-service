@@ -3,11 +3,11 @@ import Result from '../../_shared/UseCaseResult';
 import ValueObject from '../../_shared/ValueObject';
 
 interface BookingTotalBilledProps {
-  value: number;
+  value: number | null | undefined;
 }
 
 export default class BookingTotalBilled extends ValueObject<BookingTotalBilledProps> {
-  get value(): number {
+  get value(): number | null | undefined {
     return this.props.value;
   }
 
@@ -15,7 +15,7 @@ export default class BookingTotalBilled extends ValueObject<BookingTotalBilledPr
     super(props);
   }
 
-  public static create(totalBilled: number): Result<BookingTotalBilled> {
+  public static create(totalBilled?: number): Result<BookingTotalBilled> {
     const guardResult = Guard.isNumber(totalBilled, 'totalBilled');
 
     if (!guardResult.succeeded) {
