@@ -10,9 +10,11 @@ import { CreateBookingError, InvalidBookingError } from './CreateBookingErrors';
 import { CreateBookingResponse } from './CreateBookingResponse';
 
 export default class CreateBookingController extends BaseController<CreateBookingDTO> {
-  private useCase: IUseCase<CreateBookingDTO, any>;
+  private useCase: IUseCase<CreateBookingDTO, Promise<CreateBookingResponse>>;
 
-  constructor(useCase: IUseCase<CreateBookingDTO, any>) {
+  constructor(
+    useCase: IUseCase<CreateBookingDTO, Promise<CreateBookingResponse>>
+  ) {
     super();
     this.useCase = useCase;
   }
@@ -33,7 +35,7 @@ export default class CreateBookingController extends BaseController<CreateBookin
       this.created(BookingMapper.get().toDTO(useCaseResult.getValue()));
 
     try {
-      const result: CreateBookingResponse = await this.useCase.execute(dto);
+      const result = await this.useCase.execute(dto);
 
       return result.cata(processError, processResult);
     } catch (err: any) {

@@ -25,19 +25,13 @@ export default class CreateBookingUseCase
   }
 
   async execute(request: CreateBookingDTO): Promise<CreateBookingResponse> {
-    const personNameOrError: Result<BookingPersonName> =
-      BookingPersonName.create(request.personName);
-
-    const peopleNumberOrError: Result<BookingPeopleNumber> =
-      BookingPeopleNumber.create(request.peopleNumber);
-
-    const dateOrError: Result<BookingDate> = BookingDate.create(request.date);
-
-    const tableNumberOrError: Result<BookingTableNumber> =
-      BookingTableNumber.create(request.tableNumber);
-
-    const totalBilledOrError: Result<BookingTotalBilled> =
-      BookingTotalBilled.create(request.totalBilled);
+    const personNameOrError = BookingPersonName.create(request.personName);
+    const peopleNumberOrError = BookingPeopleNumber.create(
+      request.peopleNumber
+    );
+    const dateOrError = BookingDate.create(request.date);
+    const tableNumberOrError = BookingTableNumber.create(request.tableNumber);
+    const totalBilledOrError = BookingTotalBilled.create(request.totalBilled);
 
     const combinedPropsResult = Result.combine([
       personNameOrError,
@@ -70,12 +64,10 @@ export default class CreateBookingUseCase
       ) as CreateBookingResponse;
     }
 
-    const booking: Booking = bookingOrError.getValue();
+    const booking = bookingOrError.getValue();
 
     try {
-      const createdBooking: Booking | null = await this.repository.save(
-        booking
-      );
+      const createdBooking = await this.repository.save(booking);
 
       if (!createdBooking) {
         return left(
