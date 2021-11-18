@@ -1,10 +1,8 @@
-export default abstract class Mapper<T> {
-  public toDomain(raw: any): T | null {
-    throw new Error('must be overriden');
-  }
+import Result from './UseCaseResult';
 
-  public toPersistence(t: T): any {
-    throw new Error('must be overriden');
-  }
-  // public static toDTO (t: T): DTO;
+export default abstract class Mapper<DOMAIN, DTO> {
+  public abstract fromDTOToDomain(dto: DTO): Result<DOMAIN>;
+  public abstract fromPersistenceToDomain(raw: any): DOMAIN | null;
+  public abstract toPersistence(domain: DOMAIN): any;
+  public abstract toDTO(domain: DOMAIN): DTO;
 }

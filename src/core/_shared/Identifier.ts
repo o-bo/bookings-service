@@ -1,9 +1,9 @@
-export default class Identifier<T> {
-  constructor(private value: T) {
+export default class Identifier<ID> {
+  constructor(private value: ID) {
     this.value = value;
   }
 
-  equals(id?: Identifier<T>): boolean {
+  equals(id?: Identifier<ID>): boolean {
     if (id === null || id === undefined) {
       return false;
     }
@@ -21,7 +21,7 @@ export default class Identifier<T> {
    * Return raw value of identifier
    */
 
-  toValue(): T {
+  toValue(): ID {
     return this.value;
   }
 }

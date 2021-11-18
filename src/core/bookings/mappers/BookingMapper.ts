@@ -10,7 +10,7 @@ import BookingTableNumber from '../domain/BookingTableNumber';
 import BookingTotalBilled from '../domain/BookingTotalBilled';
 import CreateBookingDTO from '../useCases/createBooking/CreateBookingDTO';
 
-export default class BookingMapper extends Mapper<Booking> {
+export default class BookingMapper extends Mapper<Booking, CreateBookingDTO> {
   public toPersistence(booking: Booking): any {
     return {
       id: booking.id.toString(),
@@ -23,7 +23,46 @@ export default class BookingMapper extends Mapper<Booking> {
     };
   }
 
-  public toDomain(raw: any): Booking | null {
+  public fromDTOToDomain(bookingDTO: CreateBookingDTO): Result<Booking> {
+    const personNameOrError = BookingPersonName.create(bookingDTO.personName);
+    const peopleNumberOrError = BookingPeopleNumber.create(
+      bookingDTO.peopleNumber
+    );
+    const dateOrError = BookingDate.create(bookingDTO.date);
+    const tableNumberOrError = BookingTableNumber.create(
+      bookingDTO.tableNumber
+    );
+    const totalBilledOrError = BookingTotalBilled.create(
+      bookingDTO.totalBilled
+    );
+
+    const combinedPropsResult = Result.combine([
+      personNameOrError,
+      peopleNumberOrError,
+      dateOrError,
+      tableNumberOrError,
+      totalBilledOrError
+    ]);
+
+    if (combinedPropsResult.isFailure) {
+      return combinedPropsResult;
+    }
+
+    const bookingOrError = Booking.create({
+      personName: personNameOrError.getValue(),
+      peopleNumber: peopleNumberOrError.getValue(),
+      date: dateOrError.getValue(),
+      tableNumber: tableNumberOrError.getValue(),
+      ...(totalBilledOrError.getValue() && {
+        totalBilled: totalBilledOrError.getValue()
+      }),
+      openedStatus: false
+    });
+
+    return bookingOrError;
+  }
+
+  public fromPersistenceToDomain(raw: any): Booking | null {
     const personNameOrError: Result<BookingPersonName> =
       BookingPersonName.create(raw.person_name);
     const peopleNumberOrError: Result<BookingPeopleNumber> =

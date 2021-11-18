@@ -1,11 +1,11 @@
 import UniqueEntityId from './UniqueEntityId';
 
-export default abstract class Entity<T> {
+export default abstract class Entity<PROPS> {
   protected readonly _id: UniqueEntityId;
 
-  public readonly props: T;
+  public readonly props: PROPS;
 
-  constructor(props: T, id?: UniqueEntityId) {
+  constructor(props: PROPS, id?: UniqueEntityId) {
     this._id = id ? id : new UniqueEntityId();
     this.props = props;
   }
@@ -14,7 +14,7 @@ export default abstract class Entity<T> {
     return v instanceof Entity;
   }
 
-  public equals(object?: Entity<T>): boolean {
+  public equals(object?: Entity<PROPS>): boolean {
     if (object == null || object == undefined) {
       return false;
     }

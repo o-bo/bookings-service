@@ -4,7 +4,7 @@
 import Entity from './Entity';
 import UniqueEntityID from './UniqueEntityId';
 
-export default abstract class AggregateRoot<T> extends Entity<T> {
+export default abstract class AggregateRoot<ENT> extends Entity<ENT> {
   // private _domainEvents: IDomainEvent[] = [];
 
   get id(): UniqueEntityID {

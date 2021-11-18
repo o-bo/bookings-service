@@ -9,14 +9,14 @@ interface ValueObjectProps {
  * equality through their structrual property.
  */
 
-export default abstract class ValueObject<T extends ValueObjectProps> {
-  public readonly props: T;
+export default abstract class ValueObject<VOP extends ValueObjectProps> {
+  public readonly props: VOP;
 
-  constructor(props: T) {
+  constructor(props: VOP) {
     this.props = Object.freeze(props);
   }
 
-  public equals(vo?: ValueObject<T>): boolean {
+  public equals(vo?: ValueObject<VOP>): boolean {
     if (vo === null || vo === undefined) {
       return false;
     }

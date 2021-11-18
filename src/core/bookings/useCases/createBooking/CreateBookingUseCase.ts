@@ -4,12 +4,7 @@ import Result, { left, right } from '../../../_shared/UseCaseResult';
 
 import IBookingRepository from '../../repositories/IBookingRepository';
 
-import Booking from '../../domain/Booking';
-import BookingPersonName from '../../domain/BookingPersonName';
-import BookingPeopleNumber from '../../domain/BookingPeopleNumber';
-import BookingDate from '../../domain/BookingDate';
-import BookingTableNumber from '../../domain/BookingTableNumber';
-import BookingTotalBilled from '../../domain/BookingTotalBilled';
+import BookingMapper from '../../mappers/BookingMapper';
 
 import CreateBookingDTO from './CreateBookingDTO';
 import { CreateBookingResponse } from './CreateBookingResponse';
@@ -24,50 +19,19 @@ export default class CreateBookingUseCase
     this.repository = repository;
   }
 
-  async execute(request: CreateBookingDTO): Promise<CreateBookingResponse> {
-    const personNameOrError = BookingPersonName.create(request.personName);
-    const peopleNumberOrError = BookingPeopleNumber.create(
-      request.peopleNumber
-    );
-    const dateOrError = BookingDate.create(request.date);
-    const tableNumberOrError = BookingTableNumber.create(request.tableNumber);
-    const totalBilledOrError = BookingTotalBilled.create(request.totalBilled);
-
-    const combinedPropsResult = Result.combine([
-      personNameOrError,
-      peopleNumberOrError,
-      dateOrError,
-      tableNumberOrError,
-      totalBilledOrError
-    ]);
-
-    if (combinedPropsResult.isFailure) {
-      return left(
-        new InvalidBookingError(combinedPropsResult.error)
-      ) as CreateBookingResponse;
-    }
-
-    const bookingOrError = Booking.create({
-      personName: personNameOrError.getValue(),
-      peopleNumber: peopleNumberOrError.getValue(),
-      date: dateOrError.getValue(),
-      tableNumber: tableNumberOrError.getValue(),
-      ...(totalBilledOrError.getValue() && {
-        totalBilled: totalBilledOrError.getValue()
-      }),
-      openedStatus: false
-    });
+  async execute(bookingDTO: CreateBookingDTO): Promise<CreateBookingResponse> {
+    const bookingOrError = BookingMapper.get().fromDTOToDomain(bookingDTO);
 
     if (bookingOrError.isFailure) {
       return left(
-        new InvalidBookingError(combinedPropsResult.error)
+        new InvalidBookingError(bookingOrError.errorValue())
       ) as CreateBookingResponse;
     }
 
-    const booking = bookingOrError.getValue();
-
     try {
-      const createdBooking = await this.repository.save(booking);
+      const createdBooking = await this.repository.save(
+        bookingOrError.getValue()
+      );
 
       if (!createdBooking) {
         return left(

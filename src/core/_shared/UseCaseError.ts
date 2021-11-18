@@ -4,11 +4,6 @@ export enum UseCaseReasonError {
   UNEXPECTED_ERROR = 'UNEXPECTED_ERROR'
 }
 
-// interface UseCaseErrorItem {
-//   attribute: string;
-//   message: string;
-// }
-
 interface IUseCaseError {
   type: string;
   reason: UseCaseReasonError;

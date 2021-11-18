@@ -20,6 +20,6 @@ export default class BookingRepository implements IBookingRepository {
         console.log(e);
         return null;
       })) as unknown as Array<any>;
-    return mapper.toDomain(savedBooking);
+    return mapper.fromPersistenceToDomain(savedBooking);
   }
 }

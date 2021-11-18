@@ -1,13 +1,13 @@
-export default class Result<T> {
+export default class Result<RSLT> {
   public isSuccess: boolean;
 
   public isFailure: boolean;
 
-  public error?: T | string | null;
+  public error?: any;
 
-  private value?: T;
+  private value?: RSLT;
 
-  public constructor(isSuccess: boolean, error?: T | string | null, value?: T) {
+  public constructor(isSuccess: boolean, error?: any, value?: RSLT) {
     if (isSuccess && error) {
       throw new Error(
         'InvalidOperation: A result cannot be successful and contain an error'
@@ -27,7 +27,7 @@ export default class Result<T> {
     Object.freeze(this);
   }
 
-  public getValue(): T {
+  public getValue(): RSLT {
     if (!this.isSuccess) {
       console.log(this.error);
       throw new Error(
@@ -38,16 +38,16 @@ export default class Result<T> {
     return this.value!;
   }
 
-  public errorValue(): T {
-    return this.error as T;
+  public errorValue(): any {
+    return this.error;
   }
 
-  public static ok<U>(value?: U): Result<U> {
-    return new Result<U>(true, null, value);
+  public static ok<RSLT>(value?: RSLT): Result<RSLT> {
+    return new Result<RSLT>(true, null, value);
   }
 
-  public static fail<U>(error: any): Result<U> {
-    return new Result<U>(false, error);
+  public static fail<RSLT>(error: any): Result<RSLT> {
+    return new Result<RSLT>(false, error);
   }
 
   public static combine(results: Result<any>[]): Result<any> {
@@ -63,52 +63,52 @@ export default class Result<T> {
   }
 }
 
-export type Either<L, A> = Left<L, A> | Right<L, A>;
+export type Either<L, R> = Left<L, R> | Right<L, R>;
 
-export class Left<L, A> {
+export class Left<L, R> {
   readonly value: L;
 
   constructor(value: L) {
     this.value = value;
   }
 
-  isLeft(): this is Left<L, A> {
+  isLeft(): this is Left<L, R> {
     return true;
   }
 
-  isRight(): this is Right<L, A> {
+  isRight(): this is Right<L, R> {
     return false;
   }
 
-  cata(fnLeft: (v: L) => any) {
+  cata(fnLeft: (l: L) => any) {
     return fnLeft(this.value);
   }
 }
 
-export class Right<L, A> {
-  readonly value: A;
+export class Right<L, R> {
+  readonly value: R;
 
-  constructor(value: A) {
+  constructor(value: R) {
     this.value = value;
   }
 
-  isLeft(): this is Left<L, A> {
+  isLeft(): this is Left<L, R> {
     return false;
   }
 
-  isRight(): this is Right<L, A> {
+  isRight(): this is Right<L, R> {
     return true;
   }
 
-  cata(_: (v: L) => any, fnRight: (v: A) => any) {
+  cata(_: (l: L) => any, fnRight: (r: R) => any) {
     return fnRight(this.value);
   }
 }
 
-export const left = <L, A>(l: L): Either<L, A> => {
+export const left = <L, R>(l: L): Either<L, R> => {
   return new Left(l);
 };
 
-export const right = <L, A>(a: A): Either<L, A> => {
-  return new Right<L, A>(a);
+export const right = <L, R>(a: R): Either<L, R> => {
+  return new Right<L, R>(a);
 };
