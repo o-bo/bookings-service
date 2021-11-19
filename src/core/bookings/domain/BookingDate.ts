@@ -1,5 +1,5 @@
 import Guard from '../../_shared/Guard';
-import Result from '../../_shared/UseCaseResult';
+import UseCaseResult from '../../_shared/UseCaseResult';
 import ValueObject from '../../_shared/ValueObject';
 
 interface BookingDateProps {
@@ -15,16 +15,16 @@ export default class BookingDate extends ValueObject<BookingDateProps> {
     super(props);
   }
 
-  public static create(date: string): Result<BookingDate> {
+  public static create(date: string): UseCaseResult<BookingDate> {
     const guardResult = Guard.combine([
       Guard.againstNullOrUndefined(date, 'date'),
       Guard.isDate(date, 'date')
     ]);
 
     if (!guardResult.succeeded) {
-      return Result.fail<BookingDate>(guardResult.message);
+      return UseCaseResult.fail<BookingDate>(guardResult.message);
     } else {
-      return Result.ok<BookingDate>(new BookingDate({ value: date }));
+      return UseCaseResult.ok<BookingDate>(new BookingDate({ value: date }));
     }
   }
 }

@@ -3,9 +3,9 @@ import IUseCase from '../../../_shared/IUseCase';
 import bookingRepository from '../../repositories';
 
 import CreateBookingUseCase from './CreateBookingUseCase';
-import CreateBookingDTO from './CreateBookingDTO';
+import CreateBookingDto from './CreateBookingDto';
 
-const createBookingUseCase: IUseCase<CreateBookingDTO, any> =
+const createBookingUseCase: IUseCase<CreateBookingDto, any> =
   new CreateBookingUseCase(bookingRepository);
 
 export default createBookingUseCase;

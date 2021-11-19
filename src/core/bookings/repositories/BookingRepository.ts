@@ -1,4 +1,5 @@
 import Booking from '../domain/Booking';
+import BookingId from '../domain/BookingId';
 import BookingMapper from '../mappers/BookingMapper';
 
 import IBookingRepository from './IBookingRepository';
@@ -21,5 +22,18 @@ export default class BookingRepository implements IBookingRepository {
         return null;
       })) as unknown as Array<any>;
     return mapper.fromPersistenceToDomain(savedBooking);
+  }
+
+  async deleteBookingById(id: BookingId): Promise<BookingId | null> {
+    const nbDeletedBooking: number = await this.db('bookings')
+      .where({
+        id: id.value
+      })
+      .delete();
+
+    if (nbDeletedBooking === 0) {
+      return null;
+    }
+    return id;
   }
 }

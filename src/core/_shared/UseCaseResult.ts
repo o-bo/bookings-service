@@ -1,4 +1,4 @@
-export default class Result<RSLT> {
+export default class UseCaseResult<RSLT> {
   public isSuccess: boolean;
 
   public isFailure: boolean;
@@ -42,23 +42,23 @@ export default class Result<RSLT> {
     return this.error;
   }
 
-  public static ok<RSLT>(value?: RSLT): Result<RSLT> {
-    return new Result<RSLT>(true, null, value);
+  public static ok<RSLT>(value?: RSLT): UseCaseResult<RSLT> {
+    return new UseCaseResult<RSLT>(true, null, value);
   }
 
-  public static fail<RSLT>(error: any): Result<RSLT> {
-    return new Result<RSLT>(false, error);
+  public static fail<RSLT>(error: any): UseCaseResult<RSLT> {
+    return new UseCaseResult<RSLT>(false, error);
   }
 
-  public static combine(results: Result<any>[]): Result<any> {
+  public static combine(results: UseCaseResult<any>[]): UseCaseResult<any> {
     const errors = [];
     for (let result of results) {
       if (result.isFailure) errors.push(result.errorValue());
     }
     if (errors.length > 0) {
-      return Result.fail(errors);
+      return UseCaseResult.fail(errors);
     } else {
-      return Result.ok();
+      return UseCaseResult.ok();
     }
   }
 }

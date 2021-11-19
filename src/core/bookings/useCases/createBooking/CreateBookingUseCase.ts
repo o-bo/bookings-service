@@ -1,17 +1,18 @@
 import { GenericAppError } from '../../../_shared/GenericAppError';
 import IUseCase from '../../../_shared/IUseCase';
-import Result, { left, right } from '../../../_shared/UseCaseResult';
+import UseCaseResult, { left, right } from '../../../_shared/UseCaseResult';
 
 import IBookingRepository from '../../repositories/IBookingRepository';
 
+import { InvalidBookingError } from '../../domain/BookingErrors';
+
 import BookingMapper from '../../mappers/BookingMapper';
 
-import CreateBookingDTO from './CreateBookingDTO';
+import CreateBookingDto from './CreateBookingDto';
 import { CreateBookingResponse } from './CreateBookingResponse';
-import { InvalidBookingError } from './CreateBookingErrors';
 
 export default class CreateBookingUseCase
-  implements IUseCase<CreateBookingDTO, Promise<CreateBookingResponse>>
+  implements IUseCase<CreateBookingDto, Promise<CreateBookingResponse>>
 {
   private repository: IBookingRepository;
 
@@ -19,8 +20,11 @@ export default class CreateBookingUseCase
     this.repository = repository;
   }
 
-  async execute(bookingDTO: CreateBookingDTO): Promise<CreateBookingResponse> {
-    const bookingOrError = BookingMapper.get().fromDTOToDomain(bookingDTO);
+  async execute(
+    createBookingDTO: CreateBookingDto
+  ): Promise<CreateBookingResponse> {
+    const bookingOrError =
+      BookingMapper.get().fromDtoToDomain(createBookingDTO);
 
     if (bookingOrError.isFailure) {
       return left(
@@ -41,7 +45,7 @@ export default class CreateBookingUseCase
         ) as CreateBookingResponse;
       }
 
-      return right(Result.ok<any>(createdBooking));
+      return right(UseCaseResult.ok<any>(createdBooking));
     } catch (err) {
       return left(
         new GenericAppError.UnexpectedError(err)

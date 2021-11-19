@@ -1,8 +1,8 @@
-import Result from './UseCaseResult';
+import UseCaseResult from './UseCaseResult';
 import UseCaseError, { UseCaseReasonError } from './UseCaseError';
 
 export namespace GenericAppError {
-  export class UnexpectedError extends Result<UseCaseError> {
+  export class UnexpectedError extends UseCaseResult<UseCaseError> {
     public constructor(err: any) {
       super(false, {
         type: 'error',

@@ -1,3 +1,5 @@
+import { validate } from 'uuid';
+
 export interface IGuardResult {
   succeeded: boolean;
   message?: string;
@@ -126,6 +128,17 @@ export default class Guard {
       return {
         succeeded: false,
         message: `${argumentName} is not a number`
+      };
+    } else {
+      return { succeeded: true };
+    }
+  }
+
+  public static isUUID(string: string, argumentName: string) {
+    if (!validate(string)) {
+      return {
+        succeeded: false,
+        message: `${argumentName} is not a UUID`
       };
     } else {
       return { succeeded: true };

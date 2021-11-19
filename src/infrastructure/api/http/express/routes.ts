@@ -1,13 +1,16 @@
 import express, { Request, Response, Router } from 'express';
 import { validate } from 'uuid';
 
-import { keysToCamel } from '../../../../shared/utils';
+import { keysToCamel } from '../../../../core/_shared/utils';
 
 import db from '../../../spi/storage/postgres';
 
 import createBookingUseCase from '../../../../core/bookings/useCases/createBooking';
 import CreateBookingController from '../../../../core/bookings/useCases/createBooking/CreateBookingController';
-import CreateBookingDTO from '../../../../core/bookings/useCases/createBooking/CreateBookingDTO';
+import CreateBookingDto from '../../../../core/bookings/useCases/createBooking/CreateBookingDto';
+import deleteBookingUseCase from '../../../../core/bookings/useCases/deleteBooking';
+import DeleteBookingController from '../../../../core/bookings/useCases/deleteBooking/DeleteBookingController';
+import DeleteBookingDto from '../../../../core/bookings/useCases/deleteBooking/DeleteBookingDto';
 
 import BaseController from './BaseController';
 
@@ -167,23 +170,10 @@ curl -X DELETE -H "Content-Type: application/json" \
 router.delete(
   '/bookings/:id',
   asyncHandler(async (req: Request, res: Response) => {
-    const deletedBooking = await db('bookings')
-      .where({
-        id: req.params.id
-      })
-      .delete();
+    const controller: BaseController<DeleteBookingDto> =
+      new DeleteBookingController(deleteBookingUseCase);
 
-    if (deletedBooking === 0) {
-      return res.status(404).send({
-        type: 'error',
-        reason: 'NOT_FOUND_ERROR',
-        message: 'BOOKING_NOT_FOUND'
-      });
-    }
-
-    return res.status(200).send({
-      id: req.params.id
-    });
+    return controller.execute(req, res);
   })
 );
 
@@ -196,7 +186,7 @@ curl -X POST -H "Content-Type: application/json" \
 router.post(
   '/bookings/',
   asyncHandler(async (req: Request, res: Response) => {
-    const controller: BaseController<CreateBookingDTO> =
+    const controller: BaseController<CreateBookingDto> =
       new CreateBookingController(createBookingUseCase);
 
     return controller.execute(req, res);

@@ -1,26 +1,29 @@
 import BaseController from '../../../../infrastructure/api/http/express/BaseController';
 
 import IUseCase from '../../../_shared/IUseCase';
-import Result from '../../../_shared/UseCaseResult';
+import UseCaseResult from '../../../_shared/UseCaseResult';
+
 import Booking from '../../domain/Booking';
+import { InvalidBookingError } from '../../domain/BookingErrors';
+
 import BookingMapper from '../../mappers/BookingMapper';
 
-import CreateBookingDTO from './CreateBookingDTO';
-import { CreateBookingError, InvalidBookingError } from './CreateBookingErrors';
+import CreateBookingDto from './CreateBookingDto';
+import { CreateBookingError } from './CreateBookingErrors';
 import { CreateBookingResponse } from './CreateBookingResponse';
 
-export default class CreateBookingController extends BaseController<CreateBookingDTO> {
-  private useCase: IUseCase<CreateBookingDTO, Promise<CreateBookingResponse>>;
+export default class CreateBookingController extends BaseController<CreateBookingDto> {
+  private useCase: IUseCase<CreateBookingDto, Promise<CreateBookingResponse>>;
 
   constructor(
-    useCase: IUseCase<CreateBookingDTO, Promise<CreateBookingResponse>>
+    useCase: IUseCase<CreateBookingDto, Promise<CreateBookingResponse>>
   ) {
     super();
     this.useCase = useCase;
   }
 
   async executeImpl(): Promise<any> {
-    const dto: CreateBookingDTO = this.req.body as CreateBookingDTO;
+    const dto: CreateBookingDto = this.req.body as CreateBookingDto;
 
     const processError = (error: CreateBookingError) => {
       switch (error.constructor) {
@@ -31,7 +34,7 @@ export default class CreateBookingController extends BaseController<CreateBookin
       }
     };
 
-    const processResult = (useCaseResult: Result<Booking>) =>
+    const processResult = (useCaseResult: UseCaseResult<Booking>) =>
       this.created(BookingMapper.get().toDTO(useCaseResult.getValue()));
 
     try {

@@ -142,13 +142,26 @@ describe('testing-server-routes', () => {
   });
 
   it('DELETE /bookings/:id - fail - unkown id', async () => {
+    const fakeId = v4();
     await db('bookings').insert(BOOKING_PARAMS, ['*']);
-    const { status, body } = await request(app).delete(`/bookings/${v4()}`);
+    const { status, body } = await request(app).delete(`/bookings/${fakeId}`);
     expect(status).toEqual(404);
     expect(body).toEqual({
       type: 'error',
       reason: 'NOT_FOUND_ERROR',
-      message: 'BOOKING_NOT_FOUND'
+      error: `unable to delete booking ${fakeId}`
+    });
+  });
+
+  it('DELETE /bookings/:id - fail - bad id', async () => {
+    const fakeId = 'foobar';
+    await db('bookings').insert(BOOKING_PARAMS, ['*']);
+    const { status, body } = await request(app).delete(`/bookings/${fakeId}`);
+    expect(status).toEqual(422);
+    expect(body).toEqual({
+      type: 'error',
+      reason: 'VALIDATION_ERROR',
+      error: 'id is not a UUID'
     });
   });
 

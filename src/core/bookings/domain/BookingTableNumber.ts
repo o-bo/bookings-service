@@ -1,5 +1,5 @@
 import Guard from '../../_shared/Guard';
-import Result from '../../_shared/UseCaseResult';
+import UseCaseResult from '../../_shared/UseCaseResult';
 import ValueObject from '../../_shared/ValueObject';
 
 interface BookingTableNumberProps {
@@ -15,16 +15,16 @@ export default class BookingTableNumber extends ValueObject<BookingTableNumberPr
     super(props);
   }
 
-  public static create(tableNumber: number): Result<BookingTableNumber> {
+  public static create(tableNumber: number): UseCaseResult<BookingTableNumber> {
     const guardResult = Guard.againstNullOrUndefined(
       tableNumber,
       'tableNumber'
     );
 
     if (!guardResult.succeeded) {
-      return Result.fail<BookingTableNumber>(guardResult.message);
+      return UseCaseResult.fail<BookingTableNumber>(guardResult.message);
     } else {
-      return Result.ok<BookingTableNumber>(
+      return UseCaseResult.ok<BookingTableNumber>(
         new BookingTableNumber({ value: tableNumber })
       );
     }

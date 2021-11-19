@@ -1,11 +1,7 @@
-export default interface CreateBookingDTO {
+import BookingDto from '../../domain/BookingDto';
+
+export default interface CreateBookingDto extends BookingDto {
   id?: string;
-  personName: string;
-  peopleNumber: number;
-  date: string;
-  tableNumber: number;
-  openedStatus: boolean;
-  totalBilled?: number;
   createdAt?: string;
   uodatedAt?: string;
 }
