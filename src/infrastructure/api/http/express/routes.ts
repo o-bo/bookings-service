@@ -7,12 +7,8 @@ import db from '../../../spi/storage/postgres';
 
 import createBookingUseCase from '../../../../core/bookings/useCases/createBooking';
 import CreateBookingController from '../../../../core/bookings/useCases/createBooking/CreateBookingController';
-import CreateBookingDto from '../../../../core/bookings/useCases/createBooking/CreateBookingDto';
 import deleteBookingUseCase from '../../../../core/bookings/useCases/deleteBooking';
 import DeleteBookingController from '../../../../core/bookings/useCases/deleteBooking/DeleteBookingController';
-import DeleteBookingDto from '../../../../core/bookings/useCases/deleteBooking/DeleteBookingDto';
-
-import BaseController from './BaseController';
 
 const router: Router = express.Router();
 
@@ -170,8 +166,7 @@ curl -X DELETE -H "Content-Type: application/json" \
 router.delete(
   '/bookings/:id',
   asyncHandler(async (req: Request, res: Response) => {
-    const controller: BaseController<DeleteBookingDto> =
-      new DeleteBookingController(deleteBookingUseCase);
+    const controller = new DeleteBookingController(deleteBookingUseCase);
 
     return controller.execute(req, res);
   })
@@ -186,8 +181,7 @@ curl -X POST -H "Content-Type: application/json" \
 router.post(
   '/bookings/',
   asyncHandler(async (req: Request, res: Response) => {
-    const controller: BaseController<CreateBookingDto> =
-      new CreateBookingController(createBookingUseCase);
+    const controller = new CreateBookingController(createBookingUseCase);
 
     return controller.execute(req, res);
   })

@@ -1,7 +1,6 @@
 import BaseController from '../../../../infrastructure/api/http/express/BaseController';
 
 import IUseCase from '../../../_shared/IUseCase';
-import UseCaseResult from '../../../_shared/UseCaseResult';
 
 import {
   BookingNotFoundError,
@@ -13,7 +12,28 @@ import DeleteBookingDto from './DeleteBookingDto';
 import { DeleteBookingError } from './DeleteBookingErrors';
 import { DeleteBookingResponse } from './DeleteBookingResponse';
 
-export default class DeleteBookingController extends BaseController<DeleteBookingDto> {
+export default class DeleteBookingController extends BaseController<
+  DeleteBookingDto,
+  BookingId,
+  DeleteBookingError
+> {
+  protected processErrorImpl() {
+    switch (this.useCaseError.constructor) {
+      case BookingNotFoundError:
+        return this.notFound(this.useCaseError.errorValue());
+      case InvalidBookingIdError:
+        return this.unprocessable(this.useCaseError.errorValue());
+      default:
+        return this.fail(this.useCaseError.errorValue());
+    }
+  }
+
+  protected processResultImpl() {
+    return this.ok({
+      id: this.useCaseResult.getValue().value
+    } as DeleteBookingDto);
+  }
+
   private useCase: IUseCase<DeleteBookingDto, Promise<DeleteBookingResponse>>;
 
   constructor(
@@ -27,24 +47,13 @@ export default class DeleteBookingController extends BaseController<DeleteBookin
     const dto: DeleteBookingDto = this.req
       .params as unknown as DeleteBookingDto;
 
-    const processError = (error: DeleteBookingError) => {
-      switch (error.constructor) {
-        case BookingNotFoundError:
-          return this.notFound(error.errorValue());
-        case InvalidBookingIdError:
-          return this.unprocessable(error.errorValue());
-        default:
-          return this.fail(error.errorValue());
-      }
-    };
-
-    const processResult = (useCaseResult: UseCaseResult<BookingId>) =>
-      this.ok({ id: useCaseResult.getValue().value } as DeleteBookingDto);
-
     try {
       const result = await this.useCase.execute(dto);
 
-      return result.cata(processError, processResult);
+      return result.cata(
+        this.processError.bind(this),
+        this.processResult.bind(this)
+      );
     } catch (err: any) {
       return this.fail(err);
     }

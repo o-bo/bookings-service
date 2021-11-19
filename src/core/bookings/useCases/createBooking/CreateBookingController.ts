@@ -1,7 +1,6 @@
 import BaseController from '../../../../infrastructure/api/http/express/BaseController';
 
 import IUseCase from '../../../_shared/IUseCase';
-import UseCaseResult from '../../../_shared/UseCaseResult';
 
 import Booking from '../../domain/Booking';
 import { InvalidBookingError } from '../../domain/BookingErrors';
@@ -12,7 +11,11 @@ import CreateBookingDto from './CreateBookingDto';
 import { CreateBookingError } from './CreateBookingErrors';
 import { CreateBookingResponse } from './CreateBookingResponse';
 
-export default class CreateBookingController extends BaseController<CreateBookingDto> {
+export default class CreateBookingController extends BaseController<
+  CreateBookingDto,
+  Booking,
+  CreateBookingError
+> {
   private useCase: IUseCase<CreateBookingDto, Promise<CreateBookingResponse>>;
 
   constructor(
@@ -22,25 +25,31 @@ export default class CreateBookingController extends BaseController<CreateBookin
     this.useCase = useCase;
   }
 
+  processErrorImpl() {
+    switch (this.useCaseError.constructor) {
+      case InvalidBookingError:
+        return this.unprocessable(this.useCaseError.errorValue());
+      default:
+        return this.fail(this.useCaseError.errorValue());
+    }
+  }
+
+  processResultImpl() {
+    return this.created(
+      BookingMapper.get().toDTO(this.useCaseResult.getValue())
+    );
+  }
+
   async executeImpl(): Promise<any> {
     const dto: CreateBookingDto = this.req.body as CreateBookingDto;
-
-    const processError = (error: CreateBookingError) => {
-      switch (error.constructor) {
-        case InvalidBookingError:
-          return this.unprocessable(error.errorValue());
-        default:
-          return this.fail(error.errorValue());
-      }
-    };
-
-    const processResult = (useCaseResult: UseCaseResult<Booking>) =>
-      this.created(BookingMapper.get().toDTO(useCaseResult.getValue()));
 
     try {
       const result = await this.useCase.execute(dto);
 
-      return result.cata(processError, processResult);
+      return result.cata(
+        this.processError.bind(this),
+        this.processResult.bind(this)
+      );
     } catch (err: any) {
       return this.fail(err);
     }

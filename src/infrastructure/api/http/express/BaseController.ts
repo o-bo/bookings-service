@@ -1,13 +1,30 @@
 import * as express from 'express';
 
-export default abstract class BaseController<DTO> {
+import UseCaseResult from '../../../../core/_shared/UseCaseResult';
+
+export default abstract class BaseController<DTO, ENT, ERR> {
   // or even private
   protected req!: express.Request;
 
   protected res!: express.Response;
 
-  protected abstract executeImpl(): Promise<void | any>;
+  protected useCaseError!: ERR;
 
+  protected useCaseResult!: UseCaseResult<ENT>;
+
+  protected abstract processErrorImpl(): any;
+  protected processError(error: ERR): any {
+    this.useCaseError = error;
+    return this.processErrorImpl();
+  }
+
+  protected abstract processResultImpl(): any;
+  protected processResult(useCaseResult: UseCaseResult<ENT>): any {
+    this.useCaseResult = useCaseResult;
+    return this.processResultImpl();
+  }
+
+  protected abstract executeImpl(): Promise<void | any>;
   public execute(
     req: express.Request,
     res: express.Response
