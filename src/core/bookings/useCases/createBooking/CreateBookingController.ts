@@ -1,3 +1,7 @@
+import { inject, injectable } from 'inversify';
+
+import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
+
 import BaseController from '../../../../infrastructure/api/http/express/BaseController';
 
 import IUseCase from '../../../_shared/IUseCase';
@@ -10,7 +14,7 @@ import BookingMapper from '../../mappers/BookingMapper';
 import CreateBookingDto from './CreateBookingDto';
 import { CreateBookingError } from './CreateBookingErrors';
 import { CreateBookingResponse } from './CreateBookingResponse';
-
+@injectable()
 export default class CreateBookingController extends BaseController<
   CreateBookingDto,
   Booking,
@@ -19,6 +23,7 @@ export default class CreateBookingController extends BaseController<
   private useCase: IUseCase<CreateBookingDto, Promise<CreateBookingResponse>>;
 
   constructor(
+    @inject(SERVICE_IDENTIFIER.CREATE_BOOKING_USE_CASE)
     useCase: IUseCase<CreateBookingDto, Promise<CreateBookingResponse>>
   ) {
     super();

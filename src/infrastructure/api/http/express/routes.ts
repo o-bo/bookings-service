@@ -5,9 +5,10 @@ import { keysToCamel } from '../../../../core/_shared/utils';
 
 import db from '../../../spi/storage/postgres';
 
-import createBookingUseCase from '../../../../core/bookings/useCases/createBooking';
+import container from '../../../../core/_ioc/ioc.config';
+import SERVICE_IDENTIFIER from '../../../../core/_ioc/identifiers';
+
 import CreateBookingController from '../../../../core/bookings/useCases/createBooking/CreateBookingController';
-import deleteBookingUseCase from '../../../../core/bookings/useCases/deleteBooking';
 import DeleteBookingController from '../../../../core/bookings/useCases/deleteBooking/DeleteBookingController';
 
 const router: Router = express.Router();
@@ -166,8 +167,9 @@ curl -X DELETE -H "Content-Type: application/json" \
 router.delete(
   '/bookings/:id',
   asyncHandler(async (req: Request, res: Response) => {
-    const controller = new DeleteBookingController(deleteBookingUseCase);
-
+    const controller = container.get<DeleteBookingController>(
+      SERVICE_IDENTIFIER.DELETE_BOOKING_CONTROLLER
+    );
     return controller.execute(req, res);
   })
 );
@@ -181,7 +183,9 @@ curl -X POST -H "Content-Type: application/json" \
 router.post(
   '/bookings/',
   asyncHandler(async (req: Request, res: Response) => {
-    const controller = new CreateBookingController(createBookingUseCase);
+    const controller = container.get<CreateBookingController>(
+      SERVICE_IDENTIFIER.CREATE_BOOKING_CONTROLLER
+    );
 
     return controller.execute(req, res);
   })

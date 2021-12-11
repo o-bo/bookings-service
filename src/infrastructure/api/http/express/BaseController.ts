@@ -1,7 +1,8 @@
 import * as express from 'express';
+import { injectable } from 'inversify';
 
 import UseCaseResult from '../../../../core/_shared/UseCaseResult';
-
+@injectable()
 export default abstract class BaseController<DTO, ENT, ERR> {
   // or even private
   protected req!: express.Request;

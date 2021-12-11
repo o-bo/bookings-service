@@ -1,3 +1,7 @@
+import { inject, injectable } from 'inversify';
+
+import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
+
 import BaseController from '../../../../infrastructure/api/http/express/BaseController';
 
 import IUseCase from '../../../_shared/IUseCase';
@@ -12,11 +16,22 @@ import DeleteBookingDto from './DeleteBookingDto';
 import { DeleteBookingError } from './DeleteBookingErrors';
 import { DeleteBookingResponse } from './DeleteBookingResponse';
 
+@injectable()
 export default class DeleteBookingController extends BaseController<
   DeleteBookingDto,
   BookingId,
   DeleteBookingError
 > {
+  private useCase: IUseCase<DeleteBookingDto, Promise<DeleteBookingResponse>>;
+
+  constructor(
+    @inject(SERVICE_IDENTIFIER.DELETE_BOOKING_USE_CASE)
+    useCase: IUseCase<DeleteBookingDto, Promise<DeleteBookingResponse>>
+  ) {
+    super();
+    this.useCase = useCase;
+  }
+
   protected processErrorImpl() {
     switch (this.useCaseError.constructor) {
       case BookingNotFoundError:
@@ -32,15 +47,6 @@ export default class DeleteBookingController extends BaseController<
     return this.ok({
       id: this.useCaseResult.getValue().value
     } as DeleteBookingDto);
-  }
-
-  private useCase: IUseCase<DeleteBookingDto, Promise<DeleteBookingResponse>>;
-
-  constructor(
-    useCase: IUseCase<DeleteBookingDto, Promise<DeleteBookingResponse>>
-  ) {
-    super();
-    this.useCase = useCase;
   }
 
   async executeImpl(): Promise<any> {

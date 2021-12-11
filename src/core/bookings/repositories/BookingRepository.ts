@@ -1,13 +1,17 @@
+import { inject, injectable } from 'inversify';
+
+import SERVICE_IDENTIFIER from '../../_ioc/identifiers';
+
 import Booking from '../domain/Booking';
 import BookingId from '../domain/BookingId';
 import BookingMapper from '../mappers/BookingMapper';
 
 import IBookingRepository from './IBookingRepository';
-
+@injectable()
 export default class BookingRepository implements IBookingRepository {
   private db: any;
 
-  constructor(db: any) {
+  constructor(@inject(SERVICE_IDENTIFIER.KNEX_DB) db: any) {
     this.db = db;
   }
 

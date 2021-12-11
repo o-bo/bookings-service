@@ -8,7 +8,7 @@
       "type": "node",
       "request": "launch",
       "name": "Debug Program",
-      "program": "${workspaceFolder}/src/infrastructure/http/index.ts",
+      "program": "${workspaceFolder}/src/infrastructure/api/http/index.ts",
       "preLaunchTask": "npm: build",
       "outFiles": ["${workspaceFolder}/build/**/*.js"]
     },

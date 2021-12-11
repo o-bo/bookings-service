@@ -1,3 +1,7 @@
+import { injectable, inject } from 'inversify';
+
+import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
+
 import { GenericAppError } from '../../../_shared/GenericAppError';
 import IUseCase from '../../../_shared/IUseCase';
 import UseCaseResult, { left, right } from '../../../_shared/UseCaseResult';
@@ -11,12 +15,16 @@ import BookingMapper from '../../mappers/BookingMapper';
 import CreateBookingDto from './CreateBookingDto';
 import { CreateBookingResponse } from './CreateBookingResponse';
 
+@injectable()
 export default class CreateBookingUseCase
   implements IUseCase<CreateBookingDto, Promise<CreateBookingResponse>>
 {
   private repository: IBookingRepository;
 
-  constructor(repository: IBookingRepository) {
+  constructor(
+    @inject(SERVICE_IDENTIFIER.BOOKING_REPOSITORY)
+    repository: IBookingRepository
+  ) {
     this.repository = repository;
   }
 
@@ -46,7 +54,7 @@ export default class CreateBookingUseCase
       }
 
       return right(UseCaseResult.ok<any>(createdBooking));
-    } catch (err) {
+    } catch (err: any) {
       return left(
         new GenericAppError.UnexpectedError(err)
       ) as CreateBookingResponse;

@@ -1,3 +1,7 @@
+import { inject, injectable } from 'inversify';
+
+import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
+
 import { GenericAppError } from '../../../_shared/GenericAppError';
 import IUseCase from '../../../_shared/IUseCase';
 import UseCaseResult, { left, right } from '../../../_shared/UseCaseResult';
@@ -13,12 +17,16 @@ import {
 import DeleteBookingDto from './DeleteBookingDto';
 import { DeleteBookingResponse } from './DeleteBookingResponse';
 
+@injectable()
 export default class DeleteBookingUseCase
   implements IUseCase<DeleteBookingDto, Promise<DeleteBookingResponse>>
 {
   private repository: IBookingRepository;
 
-  constructor(repository: IBookingRepository) {
+  constructor(
+    @inject(SERVICE_IDENTIFIER.BOOKING_REPOSITORY)
+    repository: IBookingRepository
+  ) {
     this.repository = repository;
   }
 
@@ -47,7 +55,7 @@ export default class DeleteBookingUseCase
       }
 
       return right(UseCaseResult.ok<any>(deletedBookingId));
-    } catch (err) {
+    } catch (err: any) {
       return left(
         new GenericAppError.UnexpectedError(err)
       ) as DeleteBookingResponse;
