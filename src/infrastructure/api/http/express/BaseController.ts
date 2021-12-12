@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { injectable } from 'inversify';
 
-import UseCaseResult from '../../../../core/_shared/UseCaseResult';
+import UseCaseResult from '../../../../domain/_shared/UseCaseResult';
 @injectable()
 export default abstract class BaseController<DTO, ENT, ERR> {
   // or even private
@@ -13,19 +13,19 @@ export default abstract class BaseController<DTO, ENT, ERR> {
 
   protected useCaseResult!: UseCaseResult<ENT>;
 
-  protected abstract processErrorImpl(): any;
+  protected abstract processErrorImpl(error: ERR): any;
   protected processError(error: ERR): any {
     this.useCaseError = error;
-    return this.processErrorImpl();
+    return this.processErrorImpl(this.useCaseError);
   }
 
-  protected abstract processResultImpl(): any;
+  protected abstract processResultImpl(useCaseResult: UseCaseResult<ENT>): any;
   protected processResult(useCaseResult: UseCaseResult<ENT>): any {
     this.useCaseResult = useCaseResult;
-    return this.processResultImpl();
+    return this.processResultImpl(this.useCaseResult);
   }
 
-  protected abstract executeImpl(): Promise<void | any>;
+  protected abstract executeImpl(params: DTO): Promise<void | any>;
   public execute(
     req: express.Request,
     res: express.Response
@@ -33,7 +33,13 @@ export default abstract class BaseController<DTO, ENT, ERR> {
     this.req = req;
     this.res = res;
 
-    return this.executeImpl();
+    const params = {
+      ...this.req.query,
+      ...this.req.params,
+      ...this.req.body
+    };
+
+    return this.executeImpl(params);
   }
 
   public static jsonResponse(

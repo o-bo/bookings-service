@@ -21,14 +21,8 @@ import { DeleteBookingResponse } from './DeleteBookingResponse';
 export default class DeleteBookingUseCase
   implements IUseCase<DeleteBookingDto, Promise<DeleteBookingResponse>>
 {
-  private repository: IBookingRepository;
-
-  constructor(
-    @inject(SERVICE_IDENTIFIER.BOOKING_REPOSITORY)
-    repository: IBookingRepository
-  ) {
-    this.repository = repository;
-  }
+  @inject(SERVICE_IDENTIFIER.BOOKING_REPOSITORY)
+  private readonly repository!: IBookingRepository;
 
   async execute(
     deleteBookingDTO: DeleteBookingDto

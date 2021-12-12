@@ -5,6 +5,7 @@ import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
 import BaseController from '../../../../infrastructure/api/http/express/BaseController';
 
 import IUseCase from '../../../_shared/IUseCase';
+import UseCaseResult from '../../../_shared/UseCaseResult';
 
 import {
   BookingNotFoundError,
@@ -22,37 +23,30 @@ export default class DeleteBookingController extends BaseController<
   BookingId,
   DeleteBookingError
 > {
-  private useCase: IUseCase<DeleteBookingDto, Promise<DeleteBookingResponse>>;
+  @inject(SERVICE_IDENTIFIER.DELETE_BOOKING_USE_CASE)
+  private readonly useCase!: IUseCase<
+    DeleteBookingDto,
+    Promise<DeleteBookingResponse>
+  >;
 
-  constructor(
-    @inject(SERVICE_IDENTIFIER.DELETE_BOOKING_USE_CASE)
-    useCase: IUseCase<DeleteBookingDto, Promise<DeleteBookingResponse>>
-  ) {
-    super();
-    this.useCase = useCase;
-  }
-
-  protected processErrorImpl() {
-    switch (this.useCaseError.constructor) {
+  protected processErrorImpl(error: DeleteBookingError) {
+    switch (error.constructor) {
       case BookingNotFoundError:
-        return this.notFound(this.useCaseError.errorValue());
+        return this.notFound(error.errorValue());
       case InvalidBookingIdError:
-        return this.unprocessable(this.useCaseError.errorValue());
+        return this.unprocessable(error.errorValue());
       default:
-        return this.fail(this.useCaseError.errorValue());
+        return this.fail(error.errorValue());
     }
   }
 
-  protected processResultImpl() {
+  protected processResultImpl(useCaseResult: UseCaseResult<BookingId>) {
     return this.ok({
-      id: this.useCaseResult.getValue().value
+      id: useCaseResult.getValue().value
     } as DeleteBookingDto);
   }
 
-  async executeImpl(): Promise<any> {
-    const dto: DeleteBookingDto = this.req
-      .params as unknown as DeleteBookingDto;
-
+  async executeImpl(dto: DeleteBookingDto): Promise<any> {
     try {
       const result = await this.useCase.execute(dto);
 

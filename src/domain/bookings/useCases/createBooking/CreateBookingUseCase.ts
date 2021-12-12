@@ -19,14 +19,8 @@ import { CreateBookingResponse } from './CreateBookingResponse';
 export default class CreateBookingUseCase
   implements IUseCase<CreateBookingDto, Promise<CreateBookingResponse>>
 {
-  private repository: IBookingRepository;
-
-  constructor(
-    @inject(SERVICE_IDENTIFIER.BOOKING_REPOSITORY)
-    repository: IBookingRepository
-  ) {
-    this.repository = repository;
-  }
+  @inject(SERVICE_IDENTIFIER.BOOKING_REPOSITORY)
+  private readonly repository!: IBookingRepository;
 
   async execute(
     createBookingDTO: CreateBookingDto
