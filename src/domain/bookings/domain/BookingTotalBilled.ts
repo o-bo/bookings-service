@@ -1,5 +1,5 @@
-import Guard from '../../_shared/Guard';
-import UseCaseResult from '../../_shared/UseCaseResult';
+import Guard, { IGuardResult } from '../../_shared/Guard';
+import Result from '../../_shared/Result';
 import ValueObject from '../../_shared/ValueObject';
 
 interface BookingTotalBilledProps {
@@ -17,15 +17,13 @@ export default class BookingTotalBilled extends ValueObject<BookingTotalBilledPr
 
   public static create(
     totalBilled?: number
-  ): UseCaseResult<BookingTotalBilled> {
+  ): Result<IGuardResult, BookingTotalBilled> {
     const guardResult = Guard.isNumber(totalBilled, 'totalBilled');
 
-    if (!guardResult.succeeded) {
-      return UseCaseResult.fail<BookingTotalBilled>(guardResult.message);
+    if (guardResult.failed) {
+      return Result.fail(guardResult.message);
     } else {
-      return UseCaseResult.ok<BookingTotalBilled>(
-        new BookingTotalBilled({ value: totalBilled })
-      );
+      return Result.ok(new BookingTotalBilled({ value: totalBilled }));
     }
   }
 }

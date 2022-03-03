@@ -1,37 +1,31 @@
-import { injectable, inject } from 'inversify';
-
+import { inject, injectable } from 'inversify';
 import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
-
 import { GenericAppError } from '../../../_shared/GenericAppError';
 import IUseCase from '../../../_shared/IUseCase';
-import UseCaseResult, { left, right } from '../../../_shared/UseCaseResult';
-
-import IBookingRepository from '../../repositories/IBookingRepository';
-
+import Result from '../../../_shared/Result';
+import Booking from '../../domain/Booking';
 import { InvalidBookingError } from '../../domain/BookingErrors';
-
 import BookingMapper from '../../mappers/BookingMapper';
-
+import IBookingRepository from '../../repositories/IBookingRepository';
 import CreateBookingDto from './CreateBookingDto';
-import { CreateBookingResponse } from './CreateBookingResponse';
+import { CreateBookingError } from './CreateBookingErrors';
 
 @injectable()
 export default class CreateBookingUseCase
-  implements IUseCase<CreateBookingDto, Promise<CreateBookingResponse>>
+  implements
+    IUseCase<CreateBookingDto, Promise<Result<CreateBookingError, Booking>>>
 {
   @inject(SERVICE_IDENTIFIER.BOOKING_REPOSITORY)
   private readonly repository!: IBookingRepository;
 
   async execute(
     createBookingDTO: CreateBookingDto
-  ): Promise<CreateBookingResponse> {
+  ): Promise<Result<CreateBookingError, Booking>> {
     const bookingOrError =
       BookingMapper.get().fromDtoToDomain(createBookingDTO);
 
     if (bookingOrError.isFailure) {
-      return left(
-        new InvalidBookingError(bookingOrError.errorValue())
-      ) as CreateBookingResponse;
+      return Result.fail(new InvalidBookingError(bookingOrError.errorValue()));
     }
 
     try {
@@ -40,18 +34,16 @@ export default class CreateBookingUseCase
       );
 
       if (!createdBooking) {
-        return left(
+        return Result.fail(
           new GenericAppError.UnexpectedError(
             'unable to save and return booking'
           )
-        ) as CreateBookingResponse;
+        );
       }
 
-      return right(UseCaseResult.ok<any>(createdBooking));
+      return Result.ok(createdBooking);
     } catch (err: any) {
-      return left(
-        new GenericAppError.UnexpectedError(err)
-      ) as CreateBookingResponse;
+      return Result.fail(new GenericAppError.UnexpectedError(err));
     }
   }
 }

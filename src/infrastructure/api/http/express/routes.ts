@@ -1,15 +1,11 @@
 import express, { Request, Response, Router } from 'express';
 import { validate } from 'uuid';
-
-import { keysToCamel } from '../../../../domain/_shared/utils';
-
-import db from '../../../spi/storage/postgres';
-
-import container from '../../../../domain/_ioc/ioc.config';
-import SERVICE_IDENTIFIER from '../../../../domain/_ioc/identifiers';
-
 import CreateBookingController from '../../../../domain/bookings/useCases/createBooking/CreateBookingController';
 import DeleteBookingController from '../../../../domain/bookings/useCases/deleteBooking/DeleteBookingController';
+import SERVICE_IDENTIFIER from '../../../../domain/_ioc/identifiers';
+import container from '../../../../domain/_ioc/ioc.config';
+import { keysToCamel } from '../../../../domain/_shared/utils';
+import db from '../../../spi/storage/postgres';
 
 const router: Router = express.Router();
 

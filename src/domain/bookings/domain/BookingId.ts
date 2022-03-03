@@ -1,5 +1,5 @@
-import Guard from '../../_shared/Guard';
-import UseCaseResult from '../../_shared/UseCaseResult';
+import Guard, { IGuardResult } from '../../_shared/Guard';
+import Result from '../../_shared/Result';
 import ValueObject from '../../_shared/ValueObject';
 
 interface BookingIdProps {
@@ -15,16 +15,16 @@ export default class BookingId extends ValueObject<BookingIdProps> {
     super(props);
   }
 
-  public static create(id: string): UseCaseResult<BookingId> {
+  public static create(id: string): Result<IGuardResult, BookingId> {
     const guardResult = Guard.combine([
       Guard.againstNullOrUndefined(id, 'id'),
       Guard.isUUID(id, 'id')
     ]);
 
-    if (!guardResult.succeeded) {
-      return UseCaseResult.fail<BookingId>(guardResult.message);
+    if (guardResult.failed) {
+      return Result.fail(guardResult.message);
     } else {
-      return UseCaseResult.ok<BookingId>(new BookingId({ value: id }));
+      return Result.ok(new BookingId({ value: id }));
     }
   }
 }

@@ -1,20 +1,13 @@
 import { inject, injectable } from 'inversify';
-
-import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
-
 import BaseController from '../../../../infrastructure/api/http/express/BaseController';
-
+import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
 import IUseCase from '../../../_shared/IUseCase';
-import UseCaseResult from '../../../_shared/UseCaseResult';
-
+import Result from '../../../_shared/Result';
 import Booking from '../../domain/Booking';
 import { InvalidBookingError } from '../../domain/BookingErrors';
-
 import BookingMapper from '../../mappers/BookingMapper';
-
 import CreateBookingDto from './CreateBookingDto';
 import { CreateBookingError } from './CreateBookingErrors';
-import { CreateBookingResponse } from './CreateBookingResponse';
 
 @injectable()
 export default class CreateBookingController extends BaseController<
@@ -25,30 +18,33 @@ export default class CreateBookingController extends BaseController<
   @inject(SERVICE_IDENTIFIER.CREATE_BOOKING_USE_CASE)
   private readonly useCase!: IUseCase<
     CreateBookingDto,
-    Promise<CreateBookingResponse>
+    Promise<Result<CreateBookingError, Booking>>
   >;
 
-  processErrorImpl(error: CreateBookingError) {
-    switch (error.constructor) {
-      case InvalidBookingError:
-        return this.unprocessable(error.errorValue());
-      default:
-        return this.fail(error.errorValue());
+  processErrorImpl(createBookingError: CreateBookingError) {
+    switch (createBookingError.constructor) {
+      case InvalidBookingError: {
+        return this.unprocessable(createBookingError);
+      }
+      default: {
+        return this.fail(createBookingError);
+      }
     }
   }
 
-  processResultImpl(useCaseResult: UseCaseResult<Booking>) {
-    return this.created(BookingMapper.get().toDTO(useCaseResult.getValue()));
+  processResultImpl(createdBooking: Booking) {
+    return this.created(BookingMapper.get().fromDomainToDto(createdBooking));
   }
 
   async executeImpl(dto: CreateBookingDto): Promise<any> {
     try {
       const result = await this.useCase.execute(dto);
 
-      return result.cata(
-        this.processError.bind(this),
-        this.processResult.bind(this)
-      );
+      if (result.isFailure) {
+        return this.processError(result.errorValue());
+      }
+
+      return this.processResult(result.getValue());
     } catch (err: any) {
       return this.fail(err);
     }

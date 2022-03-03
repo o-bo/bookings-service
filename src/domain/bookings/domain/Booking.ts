@@ -1,12 +1,11 @@
-import Guard from '../../_shared/Guard';
-import UseCaseResult from '../../_shared/UseCaseResult';
 import AggregateRoot from '../../_shared/AggregateRoot';
+import Guard, { IGuardResult } from '../../_shared/Guard';
+import Result from '../../_shared/Result';
 import UniqueEntityId from '../../_shared/UniqueEntityId';
-
-import BookingId from './BookingEntityId';
-import BookingPersonName from './BookingPersonName';
-import BookingPeopleNumber from './BookingPeopleNumber';
 import BookingDate from './BookingDate';
+import BookingId from './BookingEntityId';
+import BookingPeopleNumber from './BookingPeopleNumber';
+import BookingPersonName from './BookingPersonName';
 import BookingTableNumber from './BookingTableNumber';
 import BookingTotalBilled from './BookingTotalBilled';
 
@@ -69,7 +68,7 @@ export default class Booking extends AggregateRoot<BookingProps> {
   public static create(
     props: BookingProps,
     id?: UniqueEntityId
-  ): UseCaseResult<Booking> {
+  ): Result<IGuardResult, Booking> {
     const guardResult = Guard.againstNullOrUndefinedBulk([
       { argument: props.personName, argumentName: 'personName' },
       { argument: props.peopleNumber, argumentName: 'peopleNumber' },
@@ -78,7 +77,7 @@ export default class Booking extends AggregateRoot<BookingProps> {
     ]);
 
     if (!guardResult.succeeded) {
-      return UseCaseResult.fail<Booking>(guardResult.message);
+      return Result.fail(guardResult);
     } else {
       const booking = new Booking(props, id);
 
@@ -88,7 +87,7 @@ export default class Booking extends AggregateRoot<BookingProps> {
       //   booking.addDomainEvent(new BookingCreatedEvent(booking));
       // }
 
-      return UseCaseResult.ok<Booking>(booking);
+      return Result.ok(booking);
     }
   }
 }

@@ -1,32 +1,19 @@
 import UseCaseError, { UseCaseReasonError } from '../../_shared/UseCaseError';
-import UseCaseResult from '../../_shared/UseCaseResult';
 
-export class InvalidBookingError extends UseCaseResult<UseCaseError> {
+export class InvalidBookingError extends UseCaseError {
   constructor(errors: Array<any>) {
-    super(false, {
-      type: 'error',
-      reason: UseCaseReasonError.VALIDATION_ERROR,
-      errors
-    } as UseCaseError);
+    super('error', UseCaseReasonError.VALIDATION_ERROR, errors);
   }
 }
 
-export class BookingNotFoundError extends UseCaseResult<UseCaseError> {
+export class BookingNotFoundError extends UseCaseError {
   constructor(error: string) {
-    super(false, {
-      type: 'error',
-      reason: UseCaseReasonError.NOT_FOUND_ERROR,
-      error
-    } as UseCaseError);
+    super('error', UseCaseReasonError.NOT_FOUND_ERROR, [error]);
   }
 }
 
-export class InvalidBookingIdError extends UseCaseResult<UseCaseError> {
+export class InvalidBookingIdError extends UseCaseError {
   constructor(error: string) {
-    super(false, {
-      type: 'error',
-      reason: UseCaseReasonError.VALIDATION_ERROR,
-      error
-    } as UseCaseError);
+    super('error', UseCaseReasonError.VALIDATION_ERROR, [error]);
   }
 }

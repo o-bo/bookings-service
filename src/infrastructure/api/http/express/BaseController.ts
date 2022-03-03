@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { injectable } from 'inversify';
+import UseCaseError from '../../../../domain/_shared/UseCaseError';
 
-import UseCaseResult from '../../../../domain/_shared/UseCaseResult';
 @injectable()
 export default abstract class BaseController<DTO, ENT, ERR> {
   // or even private
@@ -9,20 +9,20 @@ export default abstract class BaseController<DTO, ENT, ERR> {
 
   protected res!: express.Response;
 
-  protected useCaseError!: ERR;
+  protected error!: ERR;
 
-  protected useCaseResult!: UseCaseResult<ENT>;
+  protected resultEntity!: ENT;
 
   protected abstract processErrorImpl(error: ERR): any;
   protected processError(error: ERR): any {
-    this.useCaseError = error;
-    return this.processErrorImpl(this.useCaseError);
+    this.error = error;
+    return this.processErrorImpl(this.error);
   }
 
-  protected abstract processResultImpl(useCaseResult: UseCaseResult<ENT>): any;
-  protected processResult(useCaseResult: UseCaseResult<ENT>): any {
-    this.useCaseResult = useCaseResult;
-    return this.processResultImpl(this.useCaseResult);
+  protected abstract processResultImpl(resultEntity: ENT): any;
+  protected processResult(resultEntity: ENT): any {
+    this.resultEntity = resultEntity;
+    return this.processResultImpl(this.resultEntity);
   }
 
   protected abstract executeImpl(params: DTO): Promise<void | any>;
@@ -58,67 +58,67 @@ export default abstract class BaseController<DTO, ENT, ERR> {
     return BaseController.jsonResponse(this.res, 201, dto);
   }
 
-  public clientError(result?: any) {
+  public clientError(error?: UseCaseError) {
     return BaseController.jsonResponse(
       this.res,
       400,
-      result ? result : { message: 'Client Error' }
+      error ? error : { message: 'Client Error' }
     );
   }
 
-  public unauthorized(result?: any) {
+  public unauthorized(error?: UseCaseError) {
     return BaseController.jsonResponse(
       this.res,
       401,
-      result ? result : { message: 'Unauthorized' }
+      error ? error : { message: 'Unauthorized' }
     );
   }
 
-  public paymentRequired(result?: any) {
+  public paymentRequired(error?: UseCaseError) {
     return BaseController.jsonResponse(
       this.res,
       402,
-      result ? result : { message: 'Payment required' }
+      error ? error : { message: 'Payment required' }
     );
   }
 
-  public forbidden(result?: any) {
+  public forbidden(error?: UseCaseError) {
     return BaseController.jsonResponse(
       this.res,
       403,
-      result ? result : { message: 'Forbidden' }
+      error ? error : { message: 'Forbidden' }
     );
   }
 
-  public notFound(result?: any) {
+  public notFound(error?: UseCaseError) {
     return BaseController.jsonResponse(
       this.res,
       404,
-      result ? result : { message: 'Not found' }
+      error ? error : { message: 'Not found' }
     );
   }
 
-  public conflict(result?: any) {
+  public conflict(error?: UseCaseError) {
     return BaseController.jsonResponse(
       this.res,
       409,
-      result ? result : { message: 'Conflict' }
+      error ? error : { message: 'Conflict' }
     );
   }
 
-  public tooMany(result?: any) {
+  public tooMany(error?: UseCaseError) {
     return BaseController.jsonResponse(
       this.res,
       429,
-      result ? result : { message: 'Too many requests' }
+      error ? error : { message: 'Too many requests' }
     );
   }
 
-  public unprocessable(result?: any) {
+  public unprocessable(error?: UseCaseError) {
     return BaseController.jsonResponse(
       this.res,
       422,
-      result ? result : { message: 'Unprocessable entity' }
+      error ? error : { message: 'Unprocessable entity' }
     );
   }
 

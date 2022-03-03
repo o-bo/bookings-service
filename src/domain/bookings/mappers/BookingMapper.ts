@@ -1,17 +1,17 @@
+import { IGuardResult } from '../../_shared/Guard';
 import Mapper from '../../_shared/Mapper';
+import Result from '../../_shared/Result';
 import UniqueEntityId from '../../_shared/UniqueEntityId';
-import UseCaseResult from '../../_shared/UseCaseResult';
-
-import BookingDto from '../domain/BookingDto';
 import Booking from '../domain/Booking';
 import BookingDate from '../domain/BookingDate';
+import BookingDto from '../domain/BookingDto';
 import BookingPeopleNumber from '../domain/BookingPeopleNumber';
 import BookingPersonName from '../domain/BookingPersonName';
 import BookingTableNumber from '../domain/BookingTableNumber';
 import BookingTotalBilled from '../domain/BookingTotalBilled';
 
 export default class BookingMapper extends Mapper<Booking, BookingDto> {
-  public toPersistence(booking: Booking): any {
+  public fromDomainToPersistence(booking: Booking): any {
     return {
       id: booking.id.toString(),
       person_name: booking.personName.value,
@@ -23,20 +23,22 @@ export default class BookingMapper extends Mapper<Booking, BookingDto> {
     };
   }
 
-  public fromDtoToDomain(bookingDTO: BookingDto): UseCaseResult<Booking> {
-    const personNameOrError = BookingPersonName.create(bookingDTO.personName);
-    const peopleNumberOrError = BookingPeopleNumber.create(
-      bookingDTO.peopleNumber
+  public fromDtoToDomain(
+    bookingDTO: BookingDto
+  ): Result<IGuardResult, Booking> {
+    const personNameOrError: Result<IGuardResult, BookingPersonName> =
+      BookingPersonName.create(bookingDTO.personName);
+    const peopleNumberOrError: Result<IGuardResult, BookingPeopleNumber> =
+      BookingPeopleNumber.create(bookingDTO.peopleNumber);
+    const dateOrError: Result<IGuardResult, BookingDate> = BookingDate.create(
+      bookingDTO.date
     );
-    const dateOrError = BookingDate.create(bookingDTO.date);
-    const tableNumberOrError = BookingTableNumber.create(
-      bookingDTO.tableNumber
-    );
-    const totalBilledOrError = BookingTotalBilled.create(
-      bookingDTO.totalBilled
-    );
+    const tableNumberOrError: Result<IGuardResult, BookingTableNumber> =
+      BookingTableNumber.create(bookingDTO.tableNumber);
+    const totalBilledOrError: Result<IGuardResult, BookingTotalBilled> =
+      BookingTotalBilled.create(bookingDTO.totalBilled);
 
-    const combinedPropsResult = UseCaseResult.combine([
+    const guardResult = Result.combine([
       personNameOrError,
       peopleNumberOrError,
       dateOrError,
@@ -44,11 +46,11 @@ export default class BookingMapper extends Mapper<Booking, BookingDto> {
       totalBilledOrError
     ]);
 
-    if (combinedPropsResult.isFailure) {
-      return combinedPropsResult;
+    if (guardResult.isFailure) {
+      return Result.fail(guardResult.errorValue());
     }
 
-    const bookingOrError = Booking.create({
+    return Booking.create({
       personName: personNameOrError.getValue(),
       peopleNumber: peopleNumberOrError.getValue(),
       date: dateOrError.getValue(),
@@ -58,24 +60,22 @@ export default class BookingMapper extends Mapper<Booking, BookingDto> {
       }),
       openedStatus: false
     });
-
-    return bookingOrError;
   }
 
   public fromPersistenceToDomain(raw: any): Booking | null {
-    const personNameOrError: UseCaseResult<BookingPersonName> =
+    const personNameOrError: Result<IGuardResult, BookingPersonName> =
       BookingPersonName.create(raw.person_name);
-    const peopleNumberOrError: UseCaseResult<BookingPeopleNumber> =
+    const peopleNumberOrError: Result<IGuardResult, BookingPeopleNumber> =
       BookingPeopleNumber.create(raw.people_number);
-    const dateOrError: UseCaseResult<BookingDate> = BookingDate.create(
+    const dateOrError: Result<IGuardResult, BookingDate> = BookingDate.create(
       raw.date
     );
-    const tableNumberOrError: UseCaseResult<BookingTableNumber> =
+    const tableNumberOrError: Result<IGuardResult, BookingTableNumber> =
       BookingTableNumber.create(raw.table_number);
-    const totalBilledOrError: UseCaseResult<BookingTotalBilled> =
+    const totalBilledOrError: Result<IGuardResult, BookingTotalBilled> =
       BookingTotalBilled.create(raw.total_billed);
 
-    const bookingOrError: UseCaseResult<Booking> = Booking.create(
+    const bookingOrError: Result<IGuardResult, Booking> = Booking.create(
       {
         personName: personNameOrError.getValue(),
         peopleNumber: peopleNumberOrError.getValue(),
@@ -92,7 +92,7 @@ export default class BookingMapper extends Mapper<Booking, BookingDto> {
     return bookingOrError.isSuccess ? bookingOrError.getValue() : null;
   }
 
-  public toDTO(booking: Booking): BookingDto {
+  public fromDomainToDto(booking: Booking): BookingDto {
     return {
       id: booking.id.toValue(),
       personName: booking.personName.value,

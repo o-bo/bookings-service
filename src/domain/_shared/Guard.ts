@@ -1,7 +1,8 @@
 import { validate } from 'uuid';
 
 export interface IGuardResult {
-  succeeded: boolean;
+  succeeded?: true;
+  failed?: true;
   message?: string;
 }
 
@@ -15,7 +16,7 @@ export type GuardArgumentCollection = IGuardArgument[];
 export default class Guard {
   public static combine(guardResults: IGuardResult[]): IGuardResult {
     for (let result of guardResults) {
-      if (result.succeeded === false) return result;
+      if (result.failed) return result;
     }
 
     return { succeeded: true };
@@ -27,7 +28,7 @@ export default class Guard {
   ): IGuardResult {
     if (argument === null || argument === undefined) {
       return {
-        succeeded: false,
+        failed: true,
         message: `${argumentName} is required`
       };
     } else {
@@ -65,7 +66,7 @@ export default class Guard {
       return { succeeded: true };
     } else {
       return {
-        succeeded: false,
+        failed: true,
         message: `${argumentName} is not one of the correct types in ${JSON.stringify(
           validValues
         )}. Got "${value}"`
@@ -82,7 +83,7 @@ export default class Guard {
     const isInRange = num >= min && num <= max;
     if (!isInRange) {
       return {
-        succeeded: false,
+        failed: true,
         message: `${argumentName} is not within range ${min} to ${max}`
       };
     } else {
@@ -104,7 +105,7 @@ export default class Guard {
 
     if (failingResult) {
       return {
-        succeeded: false,
+        failed: true,
         message: `${argumentName} is not within the range`
       };
     } else {
@@ -112,10 +113,10 @@ export default class Guard {
     }
   }
 
-  public static isDate(date: string, argumentName: string) {
+  public static isDate(date: string, argumentName: string): IGuardResult {
     if (Number.isNaN(Date.parse(date))) {
       return {
-        succeeded: false,
+        failed: true,
         message: `${argumentName} is not a date`
       };
     } else {
@@ -123,10 +124,10 @@ export default class Guard {
     }
   }
 
-  public static isNumber(number: any, argumentName: string) {
+  public static isNumber(number: any, argumentName: string): IGuardResult {
     if (number && !Number.isInteger(number)) {
       return {
-        succeeded: false,
+        failed: true,
         message: `${argumentName} is not a number`
       };
     } else {
@@ -134,10 +135,10 @@ export default class Guard {
     }
   }
 
-  public static isUUID(string: string, argumentName: string) {
+  public static isUUID(string: string, argumentName: string): IGuardResult {
     if (!validate(string)) {
       return {
-        succeeded: false,
+        failed: true,
         message: `${argumentName} is not a UUID`
       };
     } else {

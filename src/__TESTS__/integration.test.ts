@@ -1,11 +1,9 @@
 /* global beforeEach describe it expect */
+import { knex } from 'knex';
 import request from 'supertest';
 import { v4 } from 'uuid';
-import { knex } from 'knex';
-
-import dbConfig from '../infrastructure/spi/storage/postgres/knexfile';
-
 import app from '../infrastructure/api/http/express';
+import dbConfig from '../infrastructure/spi/storage/postgres/knexfile';
 
 const db = knex(dbConfig);
 
@@ -149,7 +147,7 @@ describe('testing-server-routes', () => {
     expect(body).toEqual({
       type: 'error',
       reason: 'NOT_FOUND_ERROR',
-      error: `unable to delete booking ${fakeId}`
+      errors: [`unable to delete booking ${fakeId}`]
     });
   });
 
@@ -161,7 +159,7 @@ describe('testing-server-routes', () => {
     expect(body).toEqual({
       type: 'error',
       reason: 'VALIDATION_ERROR',
-      error: 'id is not a UUID'
+      errors: ['id is not a UUID']
     });
   });
 

@@ -1,21 +1,15 @@
 import { inject, injectable } from 'inversify';
-
-import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
-
 import BaseController from '../../../../infrastructure/api/http/express/BaseController';
-
+import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
 import IUseCase from '../../../_shared/IUseCase';
-import UseCaseResult from '../../../_shared/UseCaseResult';
-
+import Result from '../../../_shared/Result';
 import {
   BookingNotFoundError,
   InvalidBookingIdError
 } from '../../domain/BookingErrors';
 import BookingId from '../../domain/BookingId';
-
 import DeleteBookingDto from './DeleteBookingDto';
 import { DeleteBookingError } from './DeleteBookingErrors';
-import { DeleteBookingResponse } from './DeleteBookingResponse';
 
 @injectable()
 export default class DeleteBookingController extends BaseController<
@@ -26,23 +20,26 @@ export default class DeleteBookingController extends BaseController<
   @inject(SERVICE_IDENTIFIER.DELETE_BOOKING_USE_CASE)
   private readonly useCase!: IUseCase<
     DeleteBookingDto,
-    Promise<DeleteBookingResponse>
+    Promise<Result<DeleteBookingError, BookingId>>
   >;
 
   protected processErrorImpl(error: DeleteBookingError) {
     switch (error.constructor) {
-      case BookingNotFoundError:
-        return this.notFound(error.errorValue());
-      case InvalidBookingIdError:
-        return this.unprocessable(error.errorValue());
-      default:
-        return this.fail(error.errorValue());
+      case BookingNotFoundError: {
+        return this.notFound(error);
+      }
+      case InvalidBookingIdError: {
+        return this.unprocessable(error);
+      }
+      default: {
+        return this.fail(error);
+      }
     }
   }
 
-  protected processResultImpl(useCaseResult: UseCaseResult<BookingId>) {
+  protected processResultImpl(deletedBookingId: BookingId) {
     return this.ok({
-      id: useCaseResult.getValue().value
+      id: deletedBookingId.value
     } as DeleteBookingDto);
   }
 
@@ -50,10 +47,11 @@ export default class DeleteBookingController extends BaseController<
     try {
       const result = await this.useCase.execute(dto);
 
-      return result.cata(
-        this.processError.bind(this),
-        this.processResult.bind(this)
-      );
+      if (result.isFailure) {
+        return this.processError(result.errorValue());
+      }
+
+      return this.processResult(result.getValue());
     } catch (err: any) {
       return this.fail(err);
     }

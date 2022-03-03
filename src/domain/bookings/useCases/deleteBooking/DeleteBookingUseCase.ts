@@ -1,38 +1,34 @@
 import { inject, injectable } from 'inversify';
-
 import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
-
 import { GenericAppError } from '../../../_shared/GenericAppError';
 import IUseCase from '../../../_shared/IUseCase';
-import UseCaseResult, { left, right } from '../../../_shared/UseCaseResult';
-
-import IBookingRepository from '../../repositories/IBookingRepository';
-
-import BookingId from '../../domain/BookingId';
+import Result from '../../../_shared/Result';
 import {
-  InvalidBookingIdError,
-  BookingNotFoundError
+  BookingNotFoundError,
+  InvalidBookingIdError
 } from '../../domain/BookingErrors';
-
+import BookingId from '../../domain/BookingId';
+import IBookingRepository from '../../repositories/IBookingRepository';
 import DeleteBookingDto from './DeleteBookingDto';
-import { DeleteBookingResponse } from './DeleteBookingResponse';
+import { DeleteBookingError } from './DeleteBookingErrors';
 
 @injectable()
 export default class DeleteBookingUseCase
-  implements IUseCase<DeleteBookingDto, Promise<DeleteBookingResponse>>
+  implements
+    IUseCase<DeleteBookingDto, Promise<Result<DeleteBookingError, BookingId>>>
 {
   @inject(SERVICE_IDENTIFIER.BOOKING_REPOSITORY)
   private readonly repository!: IBookingRepository;
 
   async execute(
     deleteBookingDTO: DeleteBookingDto
-  ): Promise<DeleteBookingResponse> {
+  ): Promise<Result<DeleteBookingError, BookingId>> {
     const bookingIdOrError = BookingId.create(deleteBookingDTO.id);
 
     if (bookingIdOrError.isFailure) {
-      return left(
+      return Result.fail(
         new InvalidBookingIdError(bookingIdOrError.errorValue())
-      ) as DeleteBookingResponse;
+      );
     }
 
     try {
@@ -41,18 +37,16 @@ export default class DeleteBookingUseCase
       );
 
       if (!deletedBookingId) {
-        return left(
+        return Result.fail(
           new BookingNotFoundError(
             `unable to delete booking ${bookingIdOrError.getValue().value}`
           )
-        ) as DeleteBookingResponse;
+        );
       }
 
-      return right(UseCaseResult.ok<any>(deletedBookingId));
+      return Result.ok(deletedBookingId);
     } catch (err: any) {
-      return left(
-        new GenericAppError.UnexpectedError(err)
-      ) as DeleteBookingResponse;
+      return Result.fail(new GenericAppError.UnexpectedError(err));
     }
   }
 }
