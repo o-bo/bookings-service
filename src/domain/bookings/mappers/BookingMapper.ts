@@ -1,14 +1,6 @@
-import { IGuardResult } from '../../_shared/Guard';
 import Mapper from '../../_shared/Mapper';
-import Result from '../../_shared/Result';
-import UniqueEntityId from '../../_shared/UniqueEntityId';
 import Booking from '../domain/Booking';
-import BookingDate from '../domain/BookingDate';
 import BookingDto from '../domain/BookingDto';
-import BookingPeopleNumber from '../domain/BookingPeopleNumber';
-import BookingPersonName from '../domain/BookingPersonName';
-import BookingTableNumber from '../domain/BookingTableNumber';
-import BookingTotalBilled from '../domain/BookingTotalBilled';
 
 export default class BookingMapper extends Mapper<Booking, BookingDto> {
   public fromDomainToPersistence(booking: Booking): any {
@@ -23,73 +15,17 @@ export default class BookingMapper extends Mapper<Booking, BookingDto> {
     };
   }
 
-  public fromDtoToDomain(
-    bookingDTO: BookingDto
-  ): Result<IGuardResult, Booking> {
-    const personNameOrError: Result<IGuardResult, BookingPersonName> =
-      BookingPersonName.create(bookingDTO.personName);
-    const peopleNumberOrError: Result<IGuardResult, BookingPeopleNumber> =
-      BookingPeopleNumber.create(bookingDTO.peopleNumber);
-    const dateOrError: Result<IGuardResult, BookingDate> = BookingDate.create(
-      bookingDTO.date
-    );
-    const tableNumberOrError: Result<IGuardResult, BookingTableNumber> =
-      BookingTableNumber.create(bookingDTO.tableNumber);
-    const totalBilledOrError: Result<IGuardResult, BookingTotalBilled> =
-      BookingTotalBilled.create(bookingDTO.totalBilled);
-
-    const guardResult = Result.combine([
-      personNameOrError,
-      peopleNumberOrError,
-      dateOrError,
-      tableNumberOrError,
-      totalBilledOrError
-    ]);
-
-    if (guardResult.isFailure) {
-      return Result.fail(guardResult.errorValue());
-    }
-
-    return Booking.create({
-      personName: personNameOrError.getValue(),
-      peopleNumber: peopleNumberOrError.getValue(),
-      date: dateOrError.getValue(),
-      tableNumber: tableNumberOrError.getValue(),
-      ...(totalBilledOrError.getValue() && {
-        totalBilled: totalBilledOrError.getValue()
-      }),
-      openedStatus: false
-    });
-  }
-
-  public fromPersistenceToDomain(raw: any): Booking | null {
-    const personNameOrError: Result<IGuardResult, BookingPersonName> =
-      BookingPersonName.create(raw.person_name);
-    const peopleNumberOrError: Result<IGuardResult, BookingPeopleNumber> =
-      BookingPeopleNumber.create(raw.people_number);
-    const dateOrError: Result<IGuardResult, BookingDate> = BookingDate.create(
-      raw.date
-    );
-    const tableNumberOrError: Result<IGuardResult, BookingTableNumber> =
-      BookingTableNumber.create(raw.table_number);
-    const totalBilledOrError: Result<IGuardResult, BookingTotalBilled> =
-      BookingTotalBilled.create(raw.total_billed);
-
-    const bookingOrError: Result<IGuardResult, Booking> = Booking.create(
-      {
-        personName: personNameOrError.getValue(),
-        peopleNumber: peopleNumberOrError.getValue(),
-        date: dateOrError.getValue(),
-        tableNumber: tableNumberOrError.getValue(),
-        openedStatus: raw.opened_status,
-        totalBilled: totalBilledOrError.getValue(),
-        createdAt: raw.created_at,
-        updatedAt: raw.updated_at
-      },
-      new UniqueEntityId(raw.id)
-    );
-
-    return bookingOrError.isSuccess ? bookingOrError.getValue() : null;
+  public fromPersistenceToDto(raw: any): BookingDto {
+    return {
+      personName: raw.person_name,
+      peopleNumber: raw.people_number,
+      date: raw.date,
+      tableNumber: raw.table_number,
+      openedStatus: raw.opened_status,
+      totalBilled: raw.total_billed,
+      createdAt: raw.created_at,
+      updatedAt: raw.updated_at
+    };
   }
 
   public fromDomainToDto(booking: Booking): BookingDto {

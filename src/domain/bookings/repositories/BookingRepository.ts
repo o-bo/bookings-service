@@ -1,5 +1,7 @@
 import { inject, injectable } from 'inversify';
 import SERVICE_IDENTIFIER from '../../_ioc/identifiers';
+import { IGuardResult } from '../../_shared/Guard';
+import Result from '../../_shared/Result';
 import Booking from '../domain/Booking';
 import BookingId from '../domain/BookingId';
 import BookingMapper from '../mappers/BookingMapper';
@@ -9,7 +11,7 @@ import IBookingRepository from './IBookingRepository';
 export default class BookingRepository implements IBookingRepository {
   @inject(SERVICE_IDENTIFIER.KNEX_DB) private readonly db!: any;
 
-  async save(booking: Booking): Promise<Booking | null> {
+  async save(booking: Booking): Promise<Result<IGuardResult, Booking>> {
     const mapper = BookingMapper.get();
     const rawBooking = mapper.fromDomainToPersistence(booking);
 
@@ -19,19 +21,24 @@ export default class BookingRepository implements IBookingRepository {
         console.log(e);
         return null;
       })) as unknown as Array<any>;
-    return mapper.fromPersistenceToDomain(savedBooking);
+
+    return Booking.init(mapper.fromPersistenceToDto(savedBooking));
   }
 
-  async deleteBookingById(id: BookingId): Promise<BookingId | null> {
-    const nbDeletedBooking: number = await this.db('bookings')
+  async deleteBooking(booking: Booking): Promise<number> {
+    return this.db('bookings')
       .where({
-        id: id.value
+        id: booking.id.toValue()
       })
       .delete();
+  }
 
-    if (nbDeletedBooking === 0) {
-      return null;
-    }
-    return id;
+  async findById(bookingId: BookingId): Promise<Result<IGuardResult, Booking>> {
+    const mapper = BookingMapper.get();
+    const [booking] = await this.db('bookings').select('*').where({
+      id: bookingId.value
+    });
+
+    return Booking.init(mapper.fromPersistenceToDto(booking || {}));
   }
 }

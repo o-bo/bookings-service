@@ -147,7 +147,7 @@ describe('testing-server-routes', () => {
     expect(body).toEqual({
       type: 'error',
       reason: 'NOT_FOUND_ERROR',
-      errors: [`unable to delete booking ${fakeId}`]
+      errors: [`unable to find booking with id ${fakeId}`]
     });
   });
 

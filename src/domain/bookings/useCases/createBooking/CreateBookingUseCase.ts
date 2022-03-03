@@ -5,7 +5,6 @@ import IUseCase from '../../../_shared/IUseCase';
 import Result from '../../../_shared/Result';
 import Booking from '../../domain/Booking';
 import { InvalidBookingError } from '../../domain/BookingErrors';
-import BookingMapper from '../../mappers/BookingMapper';
 import IBookingRepository from '../../repositories/IBookingRepository';
 import CreateBookingDto from './CreateBookingDto';
 import { CreateBookingError } from './CreateBookingErrors';
@@ -21,8 +20,7 @@ export default class CreateBookingUseCase
   async execute(
     createBookingDTO: CreateBookingDto
   ): Promise<Result<CreateBookingError, Booking>> {
-    const bookingOrError =
-      BookingMapper.get().fromDtoToDomain(createBookingDTO);
+    const bookingOrError = Booking.init(createBookingDTO);
 
     if (bookingOrError.isFailure) {
       return Result.fail(new InvalidBookingError(bookingOrError.errorValue()));
@@ -33,7 +31,7 @@ export default class CreateBookingUseCase
         bookingOrError.getValue()
       );
 
-      if (!createdBooking) {
+      if (createdBooking.isFailure) {
         return Result.fail(
           new GenericAppError.UnexpectedError(
             'unable to save and return booking'
@@ -41,7 +39,7 @@ export default class CreateBookingUseCase
         );
       }
 
-      return Result.ok(createdBooking);
+      return Result.ok(createdBooking.getValue());
     } catch (err: any) {
       return Result.fail(new GenericAppError.UnexpectedError(err));
     }

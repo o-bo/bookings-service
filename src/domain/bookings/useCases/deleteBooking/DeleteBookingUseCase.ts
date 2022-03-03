@@ -32,20 +32,25 @@ export default class DeleteBookingUseCase
     }
 
     try {
-      const deletedBookingId = await this.repository.deleteBookingById(
+      const bookingOrError = await this.repository.findById(
         bookingIdOrError.getValue()
       );
 
-      if (!deletedBookingId) {
+      if (bookingOrError.isFailure) {
         return Result.fail(
           new BookingNotFoundError(
-            `unable to delete booking ${bookingIdOrError.getValue().value}`
+            `unable to find booking with id ${
+              bookingIdOrError.getValue().value
+            }`
           )
         );
       }
 
-      return Result.ok(deletedBookingId);
+      await this.repository.deleteBooking(bookingOrError.getValue());
+
+      return Result.ok(bookingIdOrError.getValue());
     } catch (err: any) {
+      console.log('debug', err);
       return Result.fail(new GenericAppError.UnexpectedError(err));
     }
   }

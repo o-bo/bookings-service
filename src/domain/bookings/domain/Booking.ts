@@ -1,8 +1,9 @@
 import AggregateRoot from '../../_shared/AggregateRoot';
-import Guard, { IGuardResult } from '../../_shared/Guard';
+import { IGuardResult } from '../../_shared/Guard';
 import Result from '../../_shared/Result';
 import UniqueEntityId from '../../_shared/UniqueEntityId';
 import BookingDate from './BookingDate';
+import BookingDto from './BookingDto';
 import BookingId from './BookingEntityId';
 import BookingPeopleNumber from './BookingPeopleNumber';
 import BookingPersonName from './BookingPersonName';
@@ -65,29 +66,56 @@ export default class Booking extends AggregateRoot<BookingProps> {
     super(props, id);
   }
 
-  public static create(
-    props: BookingProps,
+  public static init(
+    props: BookingDto,
     id?: UniqueEntityId
   ): Result<IGuardResult, Booking> {
-    const guardResult = Guard.againstNullOrUndefinedBulk([
-      { argument: props.personName, argumentName: 'personName' },
-      { argument: props.peopleNumber, argumentName: 'peopleNumber' },
-      { argument: props.date, argumentName: 'date' },
-      { argument: props.tableNumber, argumentName: 'tableNumber' }
+    const personNameOrError: Result<IGuardResult, BookingPersonName> =
+      BookingPersonName.create(props.personName);
+    const peopleNumberOrError: Result<IGuardResult, BookingPeopleNumber> =
+      BookingPeopleNumber.create(props.peopleNumber);
+    const dateOrError: Result<IGuardResult, BookingDate> = BookingDate.create(
+      props.date
+    );
+    const tableNumberOrError: Result<IGuardResult, BookingTableNumber> =
+      BookingTableNumber.create(props.tableNumber);
+    const totalBilledOrError: Result<IGuardResult, BookingTotalBilled> =
+      BookingTotalBilled.create(props.totalBilled);
+
+    const guardResult = Result.combine([
+      personNameOrError,
+      peopleNumberOrError,
+      dateOrError,
+      tableNumberOrError,
+      totalBilledOrError
     ]);
 
-    if (!guardResult.succeeded) {
-      return Result.fail(guardResult);
-    } else {
-      const booking = new Booking(props, id);
-
-      // const idWasProvided = !!id;
-
-      // if (!idWasProvided) {
-      //   booking.addDomainEvent(new BookingCreatedEvent(booking));
-      // }
-
-      return Result.ok(booking);
+    if (guardResult.isFailure) {
+      return Result.fail(guardResult.errorValue());
     }
+
+    const booking = new Booking(
+      {
+        personName: personNameOrError.getValue(),
+        peopleNumber: peopleNumberOrError.getValue(),
+        date: dateOrError.getValue(),
+        tableNumber: tableNumberOrError.getValue(),
+        ...(totalBilledOrError.getValue() && {
+          totalBilled: totalBilledOrError.getValue()
+        }),
+        openedStatus: false,
+        createdAt: props.createdAt,
+        updatedAt: props.updatedAt
+      },
+      id
+    );
+
+    // const idWasProvided = !!id;
+
+    // if (!idWasProvided) {
+    //   booking.addDomainEvent(new BookingCreatedEvent(booking));
+    // }
+
+    return Result.ok(booking);
   }
 }

@@ -9,8 +9,8 @@ export namespace GenericAppError {
         reason: UseCaseReasonError.UNEXPECTED_ERROR,
         errors: err
       } as UseCaseError);
-      console.log(`[AppError]: An unexpected error occurred`);
-      console.error(err);
+      // console.log(`[AppError]: An unexpected error occurred`);
+      // console.error(err);
     }
 
     public static create(err: any): UnexpectedError {
