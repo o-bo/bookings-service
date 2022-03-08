@@ -1,10 +1,10 @@
-import db from '../../../infrastructure/spi/storage/postgres';
-import { IGuardResult } from '../../_shared/Guard';
-import Result from '../../_shared/Result';
-import Booking from '../domain/Booking';
-import BookingId from '../domain/BookingId';
-import BookingMapper from '../mappers/BookingMapper';
-import IBookingOutputPort from '../ports/IBookingOutputPort';
+import db from '../index';
+import { IGuardResult } from '../../../../../domain/_shared/Guard';
+import Result from '../../../../../domain/_shared/Result';
+import Booking from '../../../../../domain/bookings/entities/Booking';
+import BookingId from '../../../../../domain/bookings/entities/BookingId';
+import BookingMapper from '../../../../../domain/bookings/mappers/BookingMapper';
+import IBookingOutputPort from '../../../../../domain/bookings/ports/IBookingOutputPort';
 
 export default class BookingPostgresAdapter implements IBookingOutputPort {
   async persistBooking(

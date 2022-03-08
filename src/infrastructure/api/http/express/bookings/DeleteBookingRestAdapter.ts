@@ -1,14 +1,14 @@
-import RestAdapter from '../../../infrastructure/api/http/express/RestAdapter';
+import RestExpressAdapter from '../RestExpressAdapter';
 import {
   BookingNotFoundError,
   InvalidBookingIdError
-} from '../domain/BookingErrors';
-import BookingId from '../domain/BookingId';
-import BookingInputPort from '../ports/BookingInputPort';
-import DeleteBookingDto from '../useCases/deleteBooking/DeleteBookingDto';
-import { DeleteBookingError } from '../useCases/deleteBooking/DeleteBookingErrors';
+} from '../../../../../domain/bookings/entities/BookingErrors';
+import BookingId from '../../../../../domain/bookings/entities/BookingId';
+import BookingInputPort from '../../../../../domain/bookings/ports/BookingInputPort';
+import DeleteBookingDto from '../../../../../domain/bookings/useCases/deleteBooking/DeleteBookingDto';
+import { DeleteBookingError } from '../../../../../domain/bookings/useCases/deleteBooking/DeleteBookingErrors';
 
-export default class DeleteBookingRestAdapter extends RestAdapter<
+export default class DeleteBookingRestAdapter extends RestExpressAdapter<
   DeleteBookingDto,
   BookingId,
   DeleteBookingError

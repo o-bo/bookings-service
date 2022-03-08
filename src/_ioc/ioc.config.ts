@@ -1,7 +1,7 @@
 import { Container } from 'inversify';
 import { Knex } from 'knex';
 import 'reflect-metadata';
-import db from '../../infrastructure/spi/storage/postgres';
+import db from '../infrastructure/spi/storage/postgres';
 import SERVICE_IDENTIFIER from './identifiers';
 
 let container = new Container();

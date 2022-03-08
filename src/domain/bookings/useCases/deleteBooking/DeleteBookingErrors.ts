@@ -1,6 +1,6 @@
 import {
   BookingNotFoundError,
   InvalidBookingIdError
-} from '../../domain/BookingErrors';
+} from '../../entities/BookingErrors';
 
 export type DeleteBookingError = BookingNotFoundError | InvalidBookingIdError;

@@ -1,8 +1,8 @@
 import express, { Request, Response, Router } from 'express';
 import { validate } from 'uuid';
-import BookingPostgresAdapter from '../../../../domain/bookings/adapters/BookingPostgresAdapter';
-import CreateBookingRestAdapter from '../../../../domain/bookings/adapters/CreateBookingRestAdapter';
-import DeleteBookingRestAdapter from '../../../../domain/bookings/adapters/DeleteBookingRestAdapter';
+import BookingPostgresAdapter from '../../../spi/storage/postgres/bookings/BookingPostgresAdapter';
+import CreateBookingRestAdapter from './bookings/CreateBookingRestAdapter';
+import DeleteBookingRestAdapter from './bookings/DeleteBookingRestAdapter';
 import BookingInputPort from '../../../../domain/bookings/ports/BookingInputPort';
 import { keysToCamel } from '../../../../domain/_shared/utils';
 import db from '../../../spi/storage/postgres';

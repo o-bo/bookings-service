@@ -1,12 +1,12 @@
 import { GenericAppError } from '../../_shared/GenericAppError';
 import Result from '../../_shared/Result';
-import Booking from '../domain/Booking';
+import Booking from '../entities/Booking';
 import {
   BookingNotFoundError,
   InvalidBookingError,
   InvalidBookingIdError
-} from '../domain/BookingErrors';
-import BookingId from '../domain/BookingId';
+} from '../entities/BookingErrors';
+import BookingId from '../entities/BookingId';
 import CreateBookingDto from '../useCases/createBooking/CreateBookingDto';
 import ICreateBookingUseCase from '../useCases/createBooking/ICreateBookingUseCase';
 import DeleteBookingDto from '../useCases/deleteBooking/DeleteBookingDto';

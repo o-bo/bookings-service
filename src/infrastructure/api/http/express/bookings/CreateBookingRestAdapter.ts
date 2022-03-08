@@ -1,12 +1,12 @@
-import RestAdapter from '../../../infrastructure/api/http/express/RestAdapter';
-import Booking from '../domain/Booking';
-import { InvalidBookingError } from '../domain/BookingErrors';
-import BookingMapper from '../mappers/BookingMapper';
-import BookingInputPort from '../ports/BookingInputPort';
-import CreateBookingDto from '../useCases/createBooking/CreateBookingDto';
-import { CreateBookingError } from '../useCases/createBooking/CreateBookingErrors';
+import RestExpressAdapter from '../RestExpressAdapter';
+import Booking from '../../../../../domain/bookings/entities/Booking';
+import { InvalidBookingError } from '../../../../../domain/bookings/entities/BookingErrors';
+import BookingMapper from '../../../../../domain/bookings/mappers/BookingMapper';
+import BookingInputPort from '../../../../../domain/bookings/ports/BookingInputPort';
+import CreateBookingDto from '../../../../../domain/bookings/useCases/createBooking/CreateBookingDto';
+import { CreateBookingError } from '../../../../../domain/bookings/useCases/createBooking/CreateBookingErrors';
 
-export default class CreateBookingRestAdapter extends RestAdapter<
+export default class CreateBookingRestAdapter extends RestExpressAdapter<
   CreateBookingDto,
   Booking,
   CreateBookingError

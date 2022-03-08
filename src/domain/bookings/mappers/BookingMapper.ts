@@ -1,6 +1,6 @@
 import Mapper from '../../_shared/Mapper';
-import Booking from '../domain/Booking';
-import BookingDto from '../domain/BookingDto';
+import Booking from '../entities/Booking';
+import BookingDto from '../entities/BookingDto';
 
 export default class BookingMapper extends Mapper<Booking, BookingDto> {
   public fromDomainToPersistence(booking: Booking): any {

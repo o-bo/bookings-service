@@ -1,3 +1,3 @@
-import { InvalidBookingError } from '../../domain/BookingErrors';
+import { InvalidBookingError } from '../../entities/BookingErrors';
 
 export type CreateBookingError = InvalidBookingError;

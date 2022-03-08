@@ -64,7 +64,7 @@
       "\\.(ts)$": "ts-jest"
     },
     "setupFiles": [
-      "./src/domain/_ioc/ioc.config.ts"
+      "./src/_ioc/ioc.config.ts"
     ],
     "coverageDirectory": "coverage",
     "coverageProvider": "v8"

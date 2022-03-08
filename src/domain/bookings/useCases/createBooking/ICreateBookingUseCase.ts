@@ -1,5 +1,5 @@
 import Result from '../../../_shared/Result';
-import Booking from '../../domain/Booking';
+import Booking from '../../entities/Booking';
 import CreateBookingDto from './CreateBookingDto';
 import { CreateBookingError } from './CreateBookingErrors';
 

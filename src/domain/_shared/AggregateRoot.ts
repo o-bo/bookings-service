@@ -16,12 +16,12 @@ export default abstract class AggregateRoot<ENT> extends Entity<ENT> {
   // }
 
   // protected addDomainEvent(domainEvent: IDomainEvent): void {
-  //   // Add the domain event to this aggregate's list of domain events
+  //   // Add the entities event to this aggregate's list of entities events
   //   this._domainEvents.push(domainEvent);
-  //   // Add this aggregate instance to the domain event's list of aggregates who's
+  //   // Add this aggregate instance to the entities event's list of aggregates who's
   //   // events it eventually needs to dispatch.
   //   DomainEvents.markAggregateForDispatch(this);
-  //   // Log the domain event
+  //   // Log the entities event
   //   this.logDomainEventAdded(domainEvent);
   // }
 

@@ -1,5 +1,5 @@
 import Result from '../../../_shared/Result';
-import BookingId from '../../domain/BookingId';
+import BookingId from '../../entities/BookingId';
 import DeleteBookingDto from './DeleteBookingDto';
 import { DeleteBookingError } from './DeleteBookingErrors';
 
