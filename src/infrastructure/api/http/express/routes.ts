@@ -1,9 +1,9 @@
 import express, { Request, Response, Router } from 'express';
 import { validate } from 'uuid';
-import CreateBookingController from '../../../../domain/bookings/useCases/createBooking/CreateBookingController';
-import DeleteBookingController from '../../../../domain/bookings/useCases/deleteBooking/DeleteBookingController';
-import SERVICE_IDENTIFIER from '../../../../domain/_ioc/identifiers';
-import container from '../../../../domain/_ioc/ioc.config';
+import BookingPostgresAdapter from '../../../../domain/bookings/adapters/BookingPostgresAdapter';
+import CreateBookingRestAdapter from '../../../../domain/bookings/adapters/CreateBookingRestAdapter';
+import DeleteBookingRestAdapter from '../../../../domain/bookings/adapters/DeleteBookingRestAdapter';
+import BookingInputPort from '../../../../domain/bookings/ports/BookingInputPort';
 import { keysToCamel } from '../../../../domain/_shared/utils';
 import db from '../../../spi/storage/postgres';
 
@@ -163,9 +163,13 @@ curl -X DELETE -H "Content-Type: application/json" \
 router.delete(
   '/bookings/:id',
   asyncHandler(async (req: Request, res: Response) => {
-    const controller = container.get<DeleteBookingController>(
-      SERVICE_IDENTIFIER.DELETE_BOOKING_CONTROLLER
-    );
+    // const controller = container.get<DeleteBookingRestAdapter>(
+    //   SERVICE_IDENTIFIER.DELETE_BOOKING_REST_ADAPTER
+    // );
+
+    const bookingOutputPort = new BookingPostgresAdapter();
+    const bookingInputPort = new BookingInputPort(bookingOutputPort);
+    const controller = new DeleteBookingRestAdapter(bookingInputPort);
     return controller.execute(req, res);
   })
 );
@@ -179,10 +183,13 @@ curl -X POST -H "Content-Type: application/json" \
 router.post(
   '/bookings/',
   asyncHandler(async (req: Request, res: Response) => {
-    const controller = container.get<CreateBookingController>(
-      SERVICE_IDENTIFIER.CREATE_BOOKING_CONTROLLER
-    );
+    // const controller = container.get<CreateBookingRestAdapter>(
+    //   SERVICE_IDENTIFIER.CREATE_BOOKING_REST_ADAPTER
+    // );
 
+    const bookingOutputPort = new BookingPostgresAdapter();
+    const bookingInputPort = new BookingInputPort(bookingOutputPort);
+    const controller = new CreateBookingRestAdapter(bookingInputPort);
     return controller.execute(req, res);
   })
 );

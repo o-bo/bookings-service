@@ -3,7 +3,7 @@ import { injectable } from 'inversify';
 import UseCaseError from '../../../../domain/_shared/UseCaseError';
 
 @injectable()
-export default abstract class BaseController<DTO, ENT, ERR> {
+export default abstract class RestAdapter<DTO, ENT, ERR> {
   // or even private
   protected req!: express.Request;
 
@@ -51,15 +51,15 @@ export default abstract class BaseController<DTO, ENT, ERR> {
   }
 
   public ok(dto?: DTO) {
-    return BaseController.jsonResponse(this.res, 200, dto);
+    return RestAdapter.jsonResponse(this.res, 200, dto);
   }
 
   public created(dto?: DTO) {
-    return BaseController.jsonResponse(this.res, 201, dto);
+    return RestAdapter.jsonResponse(this.res, 201, dto);
   }
 
   public clientError(error?: UseCaseError) {
-    return BaseController.jsonResponse(
+    return RestAdapter.jsonResponse(
       this.res,
       400,
       error ? error : { message: 'Client Error' }
@@ -67,7 +67,7 @@ export default abstract class BaseController<DTO, ENT, ERR> {
   }
 
   public unauthorized(error?: UseCaseError) {
-    return BaseController.jsonResponse(
+    return RestAdapter.jsonResponse(
       this.res,
       401,
       error ? error : { message: 'Unauthorized' }
@@ -75,7 +75,7 @@ export default abstract class BaseController<DTO, ENT, ERR> {
   }
 
   public paymentRequired(error?: UseCaseError) {
-    return BaseController.jsonResponse(
+    return RestAdapter.jsonResponse(
       this.res,
       402,
       error ? error : { message: 'Payment required' }
@@ -83,7 +83,7 @@ export default abstract class BaseController<DTO, ENT, ERR> {
   }
 
   public forbidden(error?: UseCaseError) {
-    return BaseController.jsonResponse(
+    return RestAdapter.jsonResponse(
       this.res,
       403,
       error ? error : { message: 'Forbidden' }
@@ -91,7 +91,7 @@ export default abstract class BaseController<DTO, ENT, ERR> {
   }
 
   public notFound(error?: UseCaseError) {
-    return BaseController.jsonResponse(
+    return RestAdapter.jsonResponse(
       this.res,
       404,
       error ? error : { message: 'Not found' }
@@ -99,7 +99,7 @@ export default abstract class BaseController<DTO, ENT, ERR> {
   }
 
   public conflict(error?: UseCaseError) {
-    return BaseController.jsonResponse(
+    return RestAdapter.jsonResponse(
       this.res,
       409,
       error ? error : { message: 'Conflict' }
@@ -107,7 +107,7 @@ export default abstract class BaseController<DTO, ENT, ERR> {
   }
 
   public tooMany(error?: UseCaseError) {
-    return BaseController.jsonResponse(
+    return RestAdapter.jsonResponse(
       this.res,
       429,
       error ? error : { message: 'Too many requests' }
@@ -115,7 +115,7 @@ export default abstract class BaseController<DTO, ENT, ERR> {
   }
 
   public unprocessable(error?: UseCaseError) {
-    return BaseController.jsonResponse(
+    return RestAdapter.jsonResponse(
       this.res,
       422,
       error ? error : { message: 'Unprocessable entity' }
@@ -123,12 +123,12 @@ export default abstract class BaseController<DTO, ENT, ERR> {
   }
 
   public todo() {
-    return BaseController.jsonResponse(this.res, 400, { message: 'TODO' });
+    return RestAdapter.jsonResponse(this.res, 400, { message: 'TODO' });
   }
 
   public fail(error: Error | any) {
     console.log(error);
-    return this.res.status(500).json({
+    return RestAdapter.jsonResponse(this.res, 500, {
       result: error.toString()
     });
   }

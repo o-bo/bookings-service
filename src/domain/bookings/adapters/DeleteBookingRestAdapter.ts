@@ -1,27 +1,24 @@
-import { inject, injectable } from 'inversify';
-import BaseController from '../../../../infrastructure/api/http/express/BaseController';
-import SERVICE_IDENTIFIER from '../../../_ioc/identifiers';
-import IUseCase from '../../../_shared/IUseCase';
-import Result from '../../../_shared/Result';
+import RestAdapter from '../../../infrastructure/api/http/express/RestAdapter';
 import {
   BookingNotFoundError,
   InvalidBookingIdError
-} from '../../domain/BookingErrors';
-import BookingId from '../../domain/BookingId';
-import DeleteBookingDto from './DeleteBookingDto';
-import { DeleteBookingError } from './DeleteBookingErrors';
+} from '../domain/BookingErrors';
+import BookingId from '../domain/BookingId';
+import BookingInputPort from '../ports/BookingInputPort';
+import DeleteBookingDto from '../useCases/deleteBooking/DeleteBookingDto';
+import { DeleteBookingError } from '../useCases/deleteBooking/DeleteBookingErrors';
 
-@injectable()
-export default class DeleteBookingController extends BaseController<
+export default class DeleteBookingRestAdapter extends RestAdapter<
   DeleteBookingDto,
   BookingId,
   DeleteBookingError
 > {
-  @inject(SERVICE_IDENTIFIER.DELETE_BOOKING_USE_CASE)
-  private readonly useCase!: IUseCase<
-    DeleteBookingDto,
-    Promise<Result<DeleteBookingError, BookingId>>
-  >;
+  private readonly bookingInputPort: BookingInputPort;
+
+  constructor(bookingInputPort: BookingInputPort) {
+    super();
+    this.bookingInputPort = bookingInputPort;
+  }
 
   protected processErrorImpl(error: DeleteBookingError) {
     switch (error.constructor) {
@@ -45,7 +42,7 @@ export default class DeleteBookingController extends BaseController<
 
   async executeImpl(dto: DeleteBookingDto): Promise<any> {
     try {
-      const result = await this.useCase.execute(dto);
+      const result = await this.bookingInputPort.deleteBooking(dto);
 
       if (result.isFailure) {
         return this.processError(result.errorValue());
