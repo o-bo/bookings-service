@@ -1,7 +1,7 @@
-import { IGuardResult } from '../../_shared/Guard';
-import Result from '../../_shared/Result';
-import Booking from '../entities/Booking';
-import BookingId from '../entities/BookingId';
+import { IGuardResult } from '../../../_shared/Guard';
+import Result from '../../../_shared/Result';
+import Booking from '../../entities/Booking';
+import BookingId from '../../entities/BookingId';
 
 export default interface IBookingOutputPort {
   fetchBookingById(

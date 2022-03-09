@@ -4,7 +4,7 @@ import Result from '../../../../../domain/_shared/Result';
 import Booking from '../../../../../domain/bookings/entities/Booking';
 import BookingId from '../../../../../domain/bookings/entities/BookingId';
 import BookingMapper from '../../../../../domain/bookings/mappers/BookingMapper';
-import IBookingOutputPort from '../../../../../domain/bookings/ports/IBookingOutputPort';
+import IBookingOutputPort from '../../../../../domain/bookings/ports/outputs/IBookingOutputPort';
 
 export default class BookingPostgresAdapter implements IBookingOutputPort {
   async persistBooking(

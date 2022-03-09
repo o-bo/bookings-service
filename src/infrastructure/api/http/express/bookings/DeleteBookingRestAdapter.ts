@@ -4,18 +4,18 @@ import {
   InvalidBookingIdError
 } from '../../../../../domain/bookings/entities/BookingErrors';
 import BookingId from '../../../../../domain/bookings/entities/BookingId';
-import BookingInputPort from '../../../../../domain/bookings/ports/BookingInputPort';
-import DeleteBookingDto from '../../../../../domain/bookings/useCases/deleteBooking/DeleteBookingDto';
-import { DeleteBookingError } from '../../../../../domain/bookings/useCases/deleteBooking/DeleteBookingErrors';
+import DeleteBookingInputPort from '../../../../../domain/bookings/ports/inputs/delete-booking/DeleteBookingInputPort';
+import DeleteBookingDto from '../../../../../domain/bookings/useCases/delete-booking/DeleteBookingDto';
+import { DeleteBookingError } from '../../../../../domain/bookings/useCases/delete-booking/DeleteBookingErrors';
 
 export default class DeleteBookingRestAdapter extends RestExpressAdapter<
   DeleteBookingDto,
   BookingId,
   DeleteBookingError
 > {
-  private readonly bookingInputPort: BookingInputPort;
+  private readonly bookingInputPort: DeleteBookingInputPort;
 
-  constructor(bookingInputPort: BookingInputPort) {
+  constructor(bookingInputPort: DeleteBookingInputPort) {
     super();
     this.bookingInputPort = bookingInputPort;
   }

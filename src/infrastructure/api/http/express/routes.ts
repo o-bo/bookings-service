@@ -3,9 +3,10 @@ import { validate } from 'uuid';
 import BookingPostgresAdapter from '../../../spi/storage/postgres/bookings/BookingPostgresAdapter';
 import CreateBookingRestAdapter from './bookings/CreateBookingRestAdapter';
 import DeleteBookingRestAdapter from './bookings/DeleteBookingRestAdapter';
-import BookingInputPort from '../../../../domain/bookings/ports/BookingInputPort';
+import DeleteBookingInputPort from '../../../../domain/bookings/ports/inputs/delete-booking/DeleteBookingInputPort';
 import { keysToCamel } from '../../../../domain/_shared/utils';
 import db from '../../../spi/storage/postgres';
+import CreateBookingInputPort from '../../../../domain/bookings/ports/inputs/create-booking/CreateBookingInputPort';
 
 const router: Router = express.Router();
 
@@ -168,8 +169,10 @@ router.delete(
     // );
 
     const bookingOutputPort = new BookingPostgresAdapter();
-    const bookingInputPort = new BookingInputPort(bookingOutputPort);
-    const controller = new DeleteBookingRestAdapter(bookingInputPort);
+    const deleteBookingInputPort = new DeleteBookingInputPort(
+      bookingOutputPort
+    );
+    const controller = new DeleteBookingRestAdapter(deleteBookingInputPort);
     return controller.execute(req, res);
   })
 );
@@ -188,8 +191,10 @@ router.post(
     // );
 
     const bookingOutputPort = new BookingPostgresAdapter();
-    const bookingInputPort = new BookingInputPort(bookingOutputPort);
-    const controller = new CreateBookingRestAdapter(bookingInputPort);
+    const createBookingInputPort = new CreateBookingInputPort(
+      bookingOutputPort
+    );
+    const controller = new CreateBookingRestAdapter(createBookingInputPort);
     return controller.execute(req, res);
   })
 );

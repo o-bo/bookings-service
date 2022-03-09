@@ -2,18 +2,18 @@ import RestExpressAdapter from '../RestExpressAdapter';
 import Booking from '../../../../../domain/bookings/entities/Booking';
 import { InvalidBookingError } from '../../../../../domain/bookings/entities/BookingErrors';
 import BookingMapper from '../../../../../domain/bookings/mappers/BookingMapper';
-import BookingInputPort from '../../../../../domain/bookings/ports/BookingInputPort';
-import CreateBookingDto from '../../../../../domain/bookings/useCases/createBooking/CreateBookingDto';
-import { CreateBookingError } from '../../../../../domain/bookings/useCases/createBooking/CreateBookingErrors';
+import CreateBookingInputPort from '../../../../../domain/bookings/ports/inputs/create-booking/CreateBookingInputPort';
+import CreateBookingDto from '../../../../../domain/bookings/useCases/create-booking/CreateBookingDto';
+import { CreateBookingError } from '../../../../../domain/bookings/useCases/create-booking/CreateBookingErrors';
 
 export default class CreateBookingRestAdapter extends RestExpressAdapter<
   CreateBookingDto,
   Booking,
   CreateBookingError
 > {
-  private readonly bookingInputPort: BookingInputPort;
+  private readonly bookingInputPort: CreateBookingInputPort;
 
-  constructor(bookingInputPort: BookingInputPort) {
+  constructor(bookingInputPort: CreateBookingInputPort) {
     super();
     this.bookingInputPort = bookingInputPort;
   }
