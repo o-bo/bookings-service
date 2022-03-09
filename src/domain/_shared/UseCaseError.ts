@@ -17,7 +17,11 @@ export default abstract class UseCaseError implements IUseCaseError {
 
   public readonly errors?: Array<any>;
 
-  constructor(type: string, reason: UseCaseReasonError, errors?: Array<any>) {
+  protected constructor(
+    type: string,
+    reason: UseCaseReasonError,
+    errors?: Array<any>
+  ) {
     this.type = type;
     this.reason = reason;
     this.errors = errors;

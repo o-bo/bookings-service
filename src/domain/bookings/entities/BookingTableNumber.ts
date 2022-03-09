@@ -1,6 +1,8 @@
-import Guard, { IGuardResult } from '../../_shared/Guard';
+import Guard from '../../_shared/Guard';
 import Result from '../../_shared/Result';
 import ValueObject from '../../_shared/ValueObject';
+
+const DEFAULT_ERROR_MESSAGE = 'Table number is not valid';
 
 interface BookingTableNumberProps {
   value: number;
@@ -17,14 +19,14 @@ export default class BookingTableNumber extends ValueObject<BookingTableNumberPr
 
   public static create(
     tableNumber: number
-  ): Result<IGuardResult, BookingTableNumber> {
+  ): Result<string, BookingTableNumber> {
     const guardResult = Guard.againstNullOrUndefined(
       tableNumber,
       'tableNumber'
     );
 
     if (guardResult.failed) {
-      return Result.fail(guardResult.message);
+      return Result.fail(guardResult.message || DEFAULT_ERROR_MESSAGE);
     } else {
       return Result.ok(new BookingTableNumber({ value: tableNumber }));
     }

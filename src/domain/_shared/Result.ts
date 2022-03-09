@@ -5,7 +5,7 @@ export default class Result<ERR, RSLT> {
 
   public error?: ERR;
 
-  private value?: RSLT;
+  private readonly value?: RSLT;
 
   public constructor(isSuccess: boolean, error?: any, value?: RSLT) {
     if (isSuccess && error) {
@@ -34,19 +34,35 @@ export default class Result<ERR, RSLT> {
         "Can't get the value of an error result. Use 'errorValue' instead."
       );
     }
-
     return this.value!;
   }
 
-  public errorValue(): any {
-    return this.error;
+  public errorValue(): ERR {
+    if (!this.isFailure) {
+      throw new Error(
+        "Can't get the error of an success result. Use 'getValue' instead."
+      );
+    }
+    return this.error!;
+  }
+
+  // TODO: type me
+  public unwrap(successFn?: any, errorFn?: any): any {
+    if (successFn && this.isSuccess) {
+      return successFn(this.value);
+    }
+    if (errorFn && this.isFailure) {
+      return errorFn(this.error);
+    }
+    if (this.isSuccess) return this.value;
+    if (this.isFailure) return this.error;
   }
 
   public static ok<ERR, RSLT>(value?: RSLT): Result<ERR, RSLT> {
     return new Result<ERR, RSLT>(true, null, value);
   }
 
-  public static fail<ERR, RSLT>(error: any): Result<ERR, RSLT> {
+  public static fail<ERR, RSLT>(error: ERR): Result<ERR, RSLT> {
     return new Result<ERR, RSLT>(false, error);
   }
 

@@ -70,16 +70,16 @@ export default class Booking extends AggregateRoot<BookingProps> {
     props: BookingDto,
     id?: UniqueEntityId
   ): Result<IGuardResult, Booking> {
-    const personNameOrError: Result<IGuardResult, BookingPersonName> =
+    const personNameOrError: Result<string, BookingPersonName> =
       BookingPersonName.create(props.personName);
-    const peopleNumberOrError: Result<IGuardResult, BookingPeopleNumber> =
+    const peopleNumberOrError: Result<string, BookingPeopleNumber> =
       BookingPeopleNumber.create(props.peopleNumber);
-    const dateOrError: Result<IGuardResult, BookingDate> = BookingDate.create(
+    const dateOrError: Result<string, BookingDate> = BookingDate.create(
       props.date
     );
-    const tableNumberOrError: Result<IGuardResult, BookingTableNumber> =
+    const tableNumberOrError: Result<string, BookingTableNumber> =
       BookingTableNumber.create(props.tableNumber);
-    const totalBilledOrError: Result<IGuardResult, BookingTotalBilled> =
+    const totalBilledOrError: Result<string, BookingTotalBilled> =
       BookingTotalBilled.create(props.totalBilled);
 
     const guardResult = Result.combine([
@@ -91,17 +91,17 @@ export default class Booking extends AggregateRoot<BookingProps> {
     ]);
 
     if (guardResult.isFailure) {
-      return Result.fail(guardResult.errorValue());
+      return Result.fail(guardResult.unwrap());
     }
 
     const booking = new Booking(
       {
-        personName: personNameOrError.getValue(),
-        peopleNumber: peopleNumberOrError.getValue(),
-        date: dateOrError.getValue(),
-        tableNumber: tableNumberOrError.getValue(),
-        ...(totalBilledOrError.getValue() && {
-          totalBilled: totalBilledOrError.getValue()
+        personName: personNameOrError.unwrap(),
+        peopleNumber: peopleNumberOrError.unwrap(),
+        date: dateOrError.unwrap(),
+        tableNumber: tableNumberOrError.unwrap(),
+        ...(totalBilledOrError.unwrap() && {
+          totalBilled: totalBilledOrError.unwrap()
         }),
         openedStatus: false,
         createdAt: props.createdAt,
