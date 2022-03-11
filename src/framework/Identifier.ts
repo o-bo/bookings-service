@@ -1,5 +1,5 @@
 export default class Identifier<ID> {
-  constructor(private value: ID) {
+  constructor(private readonly value: ID) {
     this.value = value;
   }
 
@@ -16,10 +16,6 @@ export default class Identifier<ID> {
   toString() {
     return String(this.value);
   }
-
-  /**
-   * Return raw value of identifier
-   */
 
   toValue(): ID {
     return this.value;

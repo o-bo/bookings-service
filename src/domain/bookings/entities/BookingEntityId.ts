@@ -1,12 +1,7 @@
-import Entity from '../../_shared/Entity';
-import UniqueEntityId from '../../_shared/UniqueEntityId';
+import UniqueEntityId from '../../../framework/UniqueEntityId';
 
-export default class BookingEntityId extends Entity<any> {
-  get id(): UniqueEntityId {
-    return this._id;
-  }
-
-  private constructor(id?: UniqueEntityId) {
-    super(null, id);
+export default class BookingEntityId extends UniqueEntityId {
+  private constructor(private id?: number | string) {
+    super(id);
   }
 }

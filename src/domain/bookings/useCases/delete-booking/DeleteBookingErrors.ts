@@ -2,7 +2,7 @@ import {
   BookingNotFoundError,
   InvalidBookingIdError
 } from '../../entities/BookingErrors';
-import { UnexpectedError } from '../../../_shared/GenericAppError';
+import { UnexpectedError } from '../../../../framework/GenericAppError';
 
 export type DeleteBookingError =
   | BookingNotFoundError

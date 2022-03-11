@@ -1,5 +1,5 @@
-import { IGuardResult } from '../../../_shared/Guard';
-import Result from '../../../_shared/Result';
+import { IGuardResult } from '../../../../framework/Guard';
+import Result from '../../../../framework/Result';
 import Booking from '../../entities/Booking';
 import BookingId from '../../entities/BookingId';
 

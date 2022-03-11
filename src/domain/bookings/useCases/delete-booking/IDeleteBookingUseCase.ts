@@ -1,4 +1,4 @@
-import Result from '../../../_shared/Result';
+import Result from '../../../../framework/Result';
 import BookingId from '../../entities/BookingId';
 import DeleteBookingDto from './DeleteBookingDto';
 import { DeleteBookingError } from './DeleteBookingErrors';

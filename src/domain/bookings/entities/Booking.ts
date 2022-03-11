@@ -1,10 +1,10 @@
-import AggregateRoot from '../../_shared/AggregateRoot';
-import { IGuardResult } from '../../_shared/Guard';
-import Result from '../../_shared/Result';
-import UniqueEntityId from '../../_shared/UniqueEntityId';
+import AggregateRoot from '../../../framework/AggregateRoot';
+import { IGuardResult } from '../../../framework/Guard';
+import Result from '../../../framework/Result';
+import UniqueEntityId from '../../../framework/UniqueEntityId';
 import BookingDate from './BookingDate';
 import BookingDto from './BookingDto';
-import BookingId from './BookingEntityId';
+import BookingEntityId from './BookingEntityId';
 import BookingPeopleNumber from './BookingPeopleNumber';
 import BookingPersonName from './BookingPersonName';
 import BookingTableNumber from './BookingTableNumber';
@@ -22,12 +22,8 @@ interface BookingProps {
 }
 
 export default class Booking extends AggregateRoot<BookingProps> {
-  get id(): UniqueEntityId {
-    return this._id;
-  }
-
-  get bookingId(): BookingId {
-    return BookingId.caller(this.id);
+  get bookingEntityId(): BookingEntityId {
+    return this.id;
   }
 
   get personName(): BookingPersonName {

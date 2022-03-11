@@ -1,6 +1,6 @@
-import Guard from '../../_shared/Guard';
-import Result from '../../_shared/Result';
-import ValueObject from '../../_shared/ValueObject';
+import Guard from '../../../framework/Guard';
+import Result from '../../../framework/Result';
+import ValueObject from '../../../framework/ValueObject';
 
 const DEFAULT_ERROR_MESSAGE = 'Table number is not valid';
 

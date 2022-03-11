@@ -1,4 +1,4 @@
-import Result from '../../../_shared/Result';
+import Result from '../../../../framework/Result';
 import Booking from '../../entities/Booking';
 import CreateBookingDto from './CreateBookingDto';
 import { CreateBookingError } from './CreateBookingErrors';

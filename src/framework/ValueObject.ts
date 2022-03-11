@@ -6,13 +6,13 @@ interface ValueObjectProps {
 
 /**
  * @desc ValueObjects are objects that we determine their
- * equality through their structrual property.
+ * equality through their structural property.
  */
 
 export default abstract class ValueObject<VOP extends ValueObjectProps> {
   public readonly props: VOP;
 
-  constructor(props: VOP) {
+  protected constructor(props: VOP) {
     this.props = Object.freeze(props);
   }
 

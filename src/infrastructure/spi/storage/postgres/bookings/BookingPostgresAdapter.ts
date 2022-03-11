@@ -1,6 +1,6 @@
 import db from '../index';
-import { IGuardResult } from '../../../../../domain/_shared/Guard';
-import Result from '../../../../../domain/_shared/Result';
+import { IGuardResult } from '../../../../../framework/Guard';
+import Result from '../../../../../framework/Result';
 import Booking from '../../../../../domain/bookings/entities/Booking';
 import BookingId from '../../../../../domain/bookings/entities/BookingId';
 import BookingMapper from '../../../../../domain/bookings/mappers/BookingMapper';

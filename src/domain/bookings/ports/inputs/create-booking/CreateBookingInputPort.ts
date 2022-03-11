@@ -1,11 +1,11 @@
 import ICreateBookingUseCase from '../../../useCases/create-booking/ICreateBookingUseCase';
 import IBookingOutputPort from '../../outputs/IBookingOutputPort';
 import CreateBookingDto from '../../../useCases/create-booking/CreateBookingDto';
-import Result from '../../../../_shared/Result';
+import Result from '../../../../../framework/Result';
 import { CreateBookingError } from '../../../useCases/create-booking/CreateBookingErrors';
 import Booking from '../../../entities/Booking';
 import { InvalidBookingError } from '../../../entities/BookingErrors';
-import { UnexpectedError } from '../../../../_shared/GenericAppError';
+import { UnexpectedError } from '../../../../../framework/GenericAppError';
 
 export default class CreateBookingInputPort implements ICreateBookingUseCase {
   protected readonly bookingOutputPort: IBookingOutputPort;
