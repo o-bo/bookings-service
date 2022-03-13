@@ -13,6 +13,9 @@
     "prestart": "npm run knex:migrate:latest",
     "test": "NODE_ENV=test jest --testPathIgnorePatterns=\"e2e.test.(j|t)s\" --watchAll",
     "e2eTests": "NODE_ENV=test npm run pretest && jest --forceExit --runInBand -- e2e.test.ts",
+    "cucumber-check": "node ./node_modules/@cucumber/cucumber/bin/cucumber-js src/__TESTS__/acceptance/features/**/*.feature --dry-run --require env/set-environment-variables.ts --require src/__TESTS__/acceptance/world/custom-world.ts --require src/__TESTS__/acceptance/step-definitions/**/*.ts --require src/__TESTS__/acceptance/hooks/**/*.ts  --require-module ts-node/register --format-options \"{\\\"snippetInterface\\\": \\\"async-await\\\"}\" --format summary --format progress --format progress-bar  --publish-quiet",
+    "cucumber": "node ./node_modules/@cucumber/cucumber/bin/cucumber-js src/__TESTS__/acceptance/features/**/*.feature --require env/set-environment-variables.ts --require src/__TESTS__/acceptance/world/custom-world.ts --require src/__TESTS__/acceptance/step-definitions/**/*.ts --require src/__TESTS__/acceptance/hooks/**/*.ts  --require-module ts-node/register --format-options \"{\\\"snippetInterface\\\": \\\"async-await\\\"}\"  --format html:src/__TESTS__/acceptance/reports/report.html --format summary --format @cucumber/pretty-formatter --format cucumber-console-formatter --publish-quiet",
+    "steps-usage": "node ./node_modules/cucumber/bin/cucumber-js src/__TESTS__/acceptance/features/**/*.feature --no-color --logLevel=error --require src/__TESTS__/acceptance/step-definitions/**/*.ts --require src/__TESTS__/acceptance/hooks/**/*.ts  --require-module ts-node/register --format-options \"{\\\"snippetInterface\\\": \\\"async-await\\\"}\" --format usage --dry-run",
     "pretest": "NODE_ENV=test npm run knex:migrate:latest",
     "knex:migrate:make": "knex --knexfile src/infrastructure/spi/storage/postgres/knexfile.ts migrate:make -x ts",
     "knex:migrate:latest": "knex --knexfile src/infrastructure/spi/storage/postgres/knexfile.ts migrate:latest",
@@ -33,6 +36,9 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^7.3.2",
+    "@cucumber/html-formatter": "^18.0.0",
+    "@cucumber/pretty-formatter": "^1.0.0-alpha.1",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.0.3",
     "@types/mocha": "^9.0.0",
@@ -44,6 +50,7 @@
     "@types/uuid": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
+    "cucumber-console-formatter": "^1.0.0",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-typescript": "^15.0.0",
     "eslint-config-prettier": "^8.3.0",
