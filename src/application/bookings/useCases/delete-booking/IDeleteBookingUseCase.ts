@@ -1,5 +1,5 @@
 import Result from '../../../../framework/Result';
-import BookingId from '../../entities/BookingId';
+import BookingId from '../../../../domain/bookings/BookingId';
 import DeleteBookingDto from './DeleteBookingDto';
 import { DeleteBookingError } from './DeleteBookingErrors';
 

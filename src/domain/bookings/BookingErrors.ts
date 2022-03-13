@@ -1,6 +1,4 @@
-import UseCaseError, {
-  UseCaseReasonError
-} from '../../../framework/UseCaseError';
+import UseCaseError, { UseCaseReasonError } from '../../framework/UseCaseError';
 
 export class InvalidBookingError extends UseCaseError {
   constructor(errors: Array<any>) {

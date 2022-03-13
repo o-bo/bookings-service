@@ -1,5 +1,5 @@
 import Result from '../../../../framework/Result';
-import Booking from '../../entities/Booking';
+import Booking from '../../../../domain/bookings/Booking';
 import CreateBookingDto from './CreateBookingDto';
 import { CreateBookingError } from './CreateBookingErrors';
 

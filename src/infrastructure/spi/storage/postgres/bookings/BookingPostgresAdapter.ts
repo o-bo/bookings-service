@@ -1,10 +1,10 @@
 import db from '../index';
 import { IGuardResult } from '../../../../../framework/Guard';
 import Result from '../../../../../framework/Result';
-import Booking from '../../../../../domain/bookings/entities/Booking';
-import BookingId from '../../../../../domain/bookings/entities/BookingId';
-import BookingMapper from '../../../../../domain/bookings/mappers/BookingMapper';
-import IBookingOutputPort from '../../../../../domain/bookings/ports/outputs/IBookingOutputPort';
+import Booking from '../../../../../domain/bookings/Booking';
+import BookingId from '../../../../../domain/bookings/BookingId';
+import BookingMapper from '../../../../../application/bookings/mappers/BookingMapper';
+import IBookingOutputPort from '../../../../../application/bookings/ports/outputs/IBookingOutputPort';
 
 export default class BookingPostgresAdapter implements IBookingOutputPort {
   async persistBooking(

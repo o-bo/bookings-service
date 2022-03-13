@@ -1,7 +1,7 @@
-import AggregateRoot from '../../../framework/AggregateRoot';
-import { IGuardResult } from '../../../framework/Guard';
-import Result from '../../../framework/Result';
-import UniqueEntityId from '../../../framework/UniqueEntityId';
+import AggregateRoot from '../../framework/AggregateRoot';
+import { IGuardResult } from '../../framework/Guard';
+import Result from '../../framework/Result';
+import UniqueEntityId from '../../framework/UniqueEntityId';
 import BookingDate from './BookingDate';
 import BookingDto from './BookingDto';
 import BookingEntityId from './BookingEntityId';

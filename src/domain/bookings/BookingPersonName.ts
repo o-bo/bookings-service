@@ -1,6 +1,6 @@
-import Guard from '../../../framework/Guard';
-import Result from '../../../framework/Result';
-import ValueObject from '../../../framework/ValueObject';
+import Guard from '../../framework/Guard';
+import Result from '../../framework/Result';
+import ValueObject from '../../framework/ValueObject';
 
 const DEFAULT_ERROR_MESSAGE = 'Person name is not valid';
 

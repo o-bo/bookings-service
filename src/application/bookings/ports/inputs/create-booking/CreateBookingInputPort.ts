@@ -3,8 +3,8 @@ import IBookingOutputPort from '../../outputs/IBookingOutputPort';
 import CreateBookingDto from '../../../useCases/create-booking/CreateBookingDto';
 import Result from '../../../../../framework/Result';
 import { CreateBookingError } from '../../../useCases/create-booking/CreateBookingErrors';
-import Booking from '../../../entities/Booking';
-import { InvalidBookingError } from '../../../entities/BookingErrors';
+import Booking from '../../../../../domain/bookings/Booking';
+import { InvalidBookingError } from '../../../../../domain/bookings/BookingErrors';
 import { UnexpectedError } from '../../../../../framework/GenericAppError';
 
 export default class CreateBookingInputPort implements ICreateBookingUseCase {

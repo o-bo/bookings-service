@@ -2,11 +2,11 @@ import RestExpressAdapter from '../RestExpressAdapter';
 import {
   BookingNotFoundError,
   InvalidBookingIdError
-} from '../../../../../domain/bookings/entities/BookingErrors';
-import BookingId from '../../../../../domain/bookings/entities/BookingId';
-import DeleteBookingInputPort from '../../../../../domain/bookings/ports/inputs/delete-booking/DeleteBookingInputPort';
-import DeleteBookingDto from '../../../../../domain/bookings/useCases/delete-booking/DeleteBookingDto';
-import { DeleteBookingError } from '../../../../../domain/bookings/useCases/delete-booking/DeleteBookingErrors';
+} from '../../../../../domain/bookings/BookingErrors';
+import BookingId from '../../../../../domain/bookings/BookingId';
+import DeleteBookingInputPort from '../../../../../application/bookings/ports/inputs/delete-booking/DeleteBookingInputPort';
+import DeleteBookingDto from '../../../../../application/bookings/useCases/delete-booking/DeleteBookingDto';
+import { DeleteBookingError } from '../../../../../application/bookings/useCases/delete-booking/DeleteBookingErrors';
 
 export default class DeleteBookingRestAdapter extends RestExpressAdapter<
   DeleteBookingDto,

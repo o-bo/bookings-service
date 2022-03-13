@@ -1,4 +1,4 @@
-import BookingDto from '../../entities/BookingDto';
+import BookingDto from '../../../../domain/bookings/BookingDto';
 
 export default interface CreateBookingDto extends BookingDto {
   id?: string;

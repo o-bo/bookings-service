@@ -67,14 +67,15 @@ export default class Result<ERR, RSLT> {
   }
 
   public static combine(results: Result<any, any>[]): Result<any, any> {
-    const errors = [];
-    for (let result of results) {
-      if (result.isFailure) errors.push(result.errorValue());
-    }
+    const errors = results.reduce(
+      (acc: any[], result: Result<any, any>) =>
+        result.isFailure ? [...acc, result.errorValue()] : acc,
+      []
+    );
+
     if (errors.length > 0) {
       return Result.fail(errors);
-    } else {
-      return Result.ok();
     }
+    return Result.ok();
   }
 }

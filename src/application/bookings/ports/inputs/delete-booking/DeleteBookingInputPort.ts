@@ -3,8 +3,8 @@ import Result from '../../../../../framework/Result';
 import {
   BookingNotFoundError,
   InvalidBookingIdError
-} from '../../../entities/BookingErrors';
-import BookingId from '../../../entities/BookingId';
+} from '../../../../../domain/bookings/BookingErrors';
+import BookingId from '../../../../../domain/bookings/BookingId';
 import DeleteBookingDto from '../../../useCases/delete-booking/DeleteBookingDto';
 import { DeleteBookingError } from '../../../useCases/delete-booking/DeleteBookingErrors';
 import IDeleteBookingUseCase from '../../../useCases/delete-booking/IDeleteBookingUseCase';
