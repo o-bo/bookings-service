@@ -29,7 +29,10 @@ export default class BookingPostgresAdapter implements IBookingOutputPort {
         return null;
       })) as unknown as Array<any>;
 
-    return Booking.init(mapper.fromPersistenceToDto(savedBooking));
+    return Booking.init(
+      mapper.fromPersistenceToDto(savedBooking),
+      savedBooking.id
+    );
   }
 
   async fetchBookingById(

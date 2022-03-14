@@ -65,7 +65,7 @@ export default class Booking extends AggregateRoot<BookingProps> {
 
   public static init(
     props: BookingDto,
-    id?: UniqueEntityId
+    id?: string | number
   ): Result<IGuardResult, Booking> {
     const personNameOrError: Result<string, BookingPersonName> =
       BookingPersonName.create(props.personName);
@@ -104,7 +104,7 @@ export default class Booking extends AggregateRoot<BookingProps> {
         createdAt: props.createdAt,
         updatedAt: props.updatedAt
       },
-      id
+      new BookingEntityId(id)
     );
 
     // If the id wasn't provided, it means that we're creating a new

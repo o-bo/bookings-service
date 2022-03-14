@@ -1,8 +1,6 @@
 import * as express from 'express';
-import { injectable } from 'inversify';
 import UseCaseError from '../../../../framework/UseCaseError';
 
-@injectable()
 export default abstract class RestExpressAdapter<DTO, ENT, ERR> {
   // or even private
   protected req!: express.Request;
