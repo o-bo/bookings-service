@@ -35,8 +35,8 @@ export default class CreateBookingInputPort implements ICreateBookingUseCase {
         );
       }
 
-      DomainEventsManager.dispatchEventsForAggregate(
-        createdBooking.getValue().id
+      DomainEventsManager.dispatchEventsForAggregate<Booking>(
+        createdBooking.unwrap()
       );
 
       return Result.ok(createdBooking.unwrap());

@@ -30,7 +30,7 @@ export default class DomainEventsManager {
    * @desc Call all of the handlers for any domain events on this aggregate.
    */
 
-  private static dispatchAggregateEvents(aggregate: AggregateRoot<any>): void {
+  private static dispatchAggregateEvents<T>(aggregate: AggregateRoot<T>): void {
     aggregate.domainEvents.forEach((event: DomainEvent) =>
       this.dispatch(event)
     );
@@ -42,8 +42,8 @@ export default class DomainEventsManager {
    * @desc Removes an aggregate from the marked list.
    */
 
-  private static removeAggregateFromMarkedDispatchList(
-    aggregate: AggregateRoot<any>
+  private static removeAggregateFromMarkedDispatchList<T>(
+    aggregate: AggregateRoot<T>
   ): void {
     const index = this.markedAggregates.findIndex((a) => a.equals(aggregate));
 
@@ -70,13 +70,13 @@ export default class DomainEventsManager {
    * aggregate.
    */
 
-  public static dispatchEventsForAggregate(id: UniqueEntityId): void {
-    const aggregate = this.findMarkedAggregateById(id);
+  public static dispatchEventsForAggregate<T>(entity: AggregateRoot<T>): void {
+    const aggregate = this.findMarkedAggregateById(entity.id);
 
     if (aggregate) {
-      this.dispatchAggregateEvents(aggregate);
+      this.dispatchAggregateEvents<T>(aggregate);
       aggregate.clearEvents();
-      this.removeAggregateFromMarkedDispatchList(aggregate);
+      this.removeAggregateFromMarkedDispatchList<T>(aggregate);
     }
   }
 
