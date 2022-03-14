@@ -6,6 +6,7 @@ import { CreateBookingError } from '../../../useCases/create-booking/CreateBooki
 import Booking from '../../../../../domain/bookings/Booking';
 import { InvalidBookingError } from '../../../../../domain/bookings/BookingErrors';
 import { UnexpectedError } from '../../../../../framework/GenericAppError';
+import DomainEventsManager from '../../../../../framework/DomainEventsManager';
 
 export default class CreateBookingInputPort implements ICreateBookingUseCase {
   protected readonly bookingOutputPort: IBookingOutputPort;
@@ -33,6 +34,10 @@ export default class CreateBookingInputPort implements ICreateBookingUseCase {
           new UnexpectedError('unable to save and return booking')
         );
       }
+
+      DomainEventsManager.dispatchEventsForAggregate(
+        createdBooking.getValue().id
+      );
 
       return Result.ok(createdBooking.unwrap());
     } catch (err: any) {

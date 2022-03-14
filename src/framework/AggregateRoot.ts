@@ -1,26 +1,26 @@
-import DomainEvents from './DomainEvents';
+import DomainEventsManager from './DomainEventsManager';
 
 import Entity from './Entity';
 import UniqueEntityID from './UniqueEntityId';
-import IDomainEvent from './IDomainEvent';
+import DomainEvent from './DomainEvent';
 
 export default abstract class AggregateRoot<ENT> extends Entity<ENT> {
-  private _domainEvents: IDomainEvent[] = [];
+  private _domainEvents: DomainEvent[] = [];
 
   get id(): UniqueEntityID {
     return this._id;
   }
 
-  get domainEvents(): IDomainEvent[] {
+  get domainEvents(): DomainEvent[] {
     return this._domainEvents;
   }
 
-  protected addDomainEvent(domainEvent: IDomainEvent): void {
+  protected addDomainEvent(domainEvent: DomainEvent): void {
     // Add the entities event to this aggregate's list of entities events
     this._domainEvents.push(domainEvent);
     // Add this aggregate instance to the entities event's list of aggregates who's
     // events it eventually needs to dispatch.
-    DomainEvents.markAggregateForDispatch(this);
+    DomainEventsManager.markAggregateForDispatch(this);
     // Log the entities event
     this.logDomainEventAdded(domainEvent);
   }
@@ -29,7 +29,7 @@ export default abstract class AggregateRoot<ENT> extends Entity<ENT> {
     this._domainEvents.splice(0, this._domainEvents.length);
   }
 
-  private logDomainEventAdded(domainEvent: IDomainEvent): void {
+  private logDomainEventAdded(domainEvent: DomainEvent): void {
     const thisClass = Reflect.getPrototypeOf(this);
     const domainEventClass = Reflect.getPrototypeOf(domainEvent);
     console.info(

@@ -5,6 +5,8 @@ import { v4 } from 'uuid';
 import app from '../infrastructure/api/http/express';
 import dbConfig from '../infrastructure/spi/storage/postgres/knexfile';
 
+import '../application/bookings';
+
 const db = knex(dbConfig);
 
 const BOOKING_PARAMS = {

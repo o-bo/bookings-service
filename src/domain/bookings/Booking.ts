@@ -9,6 +9,7 @@ import BookingPeopleNumber from './BookingPeopleNumber';
 import BookingPersonName from './BookingPersonName';
 import BookingTableNumber from './BookingTableNumber';
 import BookingTotalBilled from './BookingTotalBilled';
+import BookingCreatedEvent from './events/BookingCreatedEvent';
 
 interface BookingProps {
   personName: BookingPersonName;
@@ -106,11 +107,15 @@ export default class Booking extends AggregateRoot<BookingProps> {
       id
     );
 
-    // const idWasProvided = !!id;
+    // If the id wasn't provided, it means that we're creating a new
+    // user, so we should create a UserCreatedEvent.
+    const idWasProvided = !!id;
 
-    // if (!idWasProvided) {
-    //   booking.addDomainEvent(new BookingCreatedEvent(booking));
-    // }
+    if (!idWasProvided) {
+      // Method from the AggregateRoot parent class. We'll look
+      // closer at this.
+      booking.addDomainEvent(new BookingCreatedEvent(booking));
+    }
 
     return Result.ok(booking);
   }

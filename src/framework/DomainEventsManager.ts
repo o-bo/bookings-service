@@ -1,8 +1,8 @@
-import IDomainEvent from './IDomainEvent';
+import DomainEvent from './DomainEvent';
 import AggregateRoot from './AggregateRoot';
 import UniqueEntityId from './UniqueEntityId';
 
-export default class DomainEvents {
+export default class DomainEventsManager {
   private static handlersMap: { [key: string]: any[] } = {};
 
   private static markedAggregates: AggregateRoot<any>[] = [];
@@ -31,7 +31,7 @@ export default class DomainEvents {
    */
 
   private static dispatchAggregateEvents(aggregate: AggregateRoot<any>): void {
-    aggregate.domainEvents.forEach((event: IDomainEvent) =>
+    aggregate.domainEvents.forEach((event: DomainEvent) =>
       this.dispatch(event)
     );
   }
@@ -87,7 +87,7 @@ export default class DomainEvents {
    */
 
   public static register(
-    callback: (event: IDomainEvent) => void,
+    callback: (event: DomainEvent) => Promise<void>,
     eventClassName: string
   ): void {
     if (!this.handlersMap.hasOwnProperty(eventClassName)) {
@@ -122,7 +122,7 @@ export default class DomainEvents {
    * @desc Invokes all of the subscribers to a particular domain event.
    */
 
-  private static dispatch(event: IDomainEvent): void {
+  private static dispatch(event: DomainEvent): void {
     const eventClassName: string = event.constructor.name;
 
     if (this.handlersMap.hasOwnProperty(eventClassName)) {
