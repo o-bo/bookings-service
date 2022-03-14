@@ -168,7 +168,7 @@ router.delete(
     //   SERVICE_IDENTIFIER.DELETE_BOOKING_REST_ADAPTER
     // );
 
-    const bookingOutputPort = new BookingPostgresAdapter();
+    const bookingOutputPort = BookingPostgresAdapter.getInstance();
     const deleteBookingInputPort = new DeleteBookingInputPort(
       bookingOutputPort
     );
@@ -190,7 +190,7 @@ router.post(
     //   SERVICE_IDENTIFIER.CREATE_BOOKING_REST_ADAPTER
     // );
 
-    const bookingOutputPort = new BookingPostgresAdapter();
+    const bookingOutputPort = BookingPostgresAdapter.getInstance();
     const createBookingInputPort = new CreateBookingInputPort(
       bookingOutputPort
     );

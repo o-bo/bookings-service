@@ -7,6 +7,15 @@ import BookingMapper from '../../../../../application/bookings/mappers/BookingMa
 import IBookingOutputPort from '../../../../../application/bookings/ports/outputs/IBookingOutputPort';
 
 export default class BookingPostgresAdapter implements IBookingOutputPort {
+  private static instance: BookingPostgresAdapter;
+
+  public static getInstance() {
+    if (!BookingPostgresAdapter.instance) {
+      this.instance = new BookingPostgresAdapter();
+    }
+    return this.instance;
+  }
+
   async persistBooking(
     booking: Booking
   ): Promise<Result<IGuardResult, Booking>> {
