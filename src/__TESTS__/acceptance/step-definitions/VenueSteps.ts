@@ -18,7 +18,7 @@ function assertAllVenuesAreEqual(allVenues: Venue[], expectedVenues: any[]) {
           venue.name.toValue() === expectedVenue.name &&
           venue.address.toValue() === expectedVenue.address
       )
-    )
+    ) && expectedVenues.length === allVenues.length
   );
 }
 
