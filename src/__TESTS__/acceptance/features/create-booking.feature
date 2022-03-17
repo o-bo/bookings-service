@@ -13,13 +13,8 @@ Feature: Create a booking
       |  |  | 2      | abc     | 6        |  |
       |  |  | 1      | def     | 2        |  |
       |  |  | 2      | def     | 4        |  |
-    Given there are customers:
-      | id  | name           |
-      | abc | Jean Rochefort |
-      | def | Lou Bega       |
-      | ghi | Ricky Martin   |
 
-    Scenario Outline: there are available tables
+  Scenario Outline: there are available tables
       Given I am customer "<personName>"
       When I book a table at "<venueName>", "<venueAddress>", for "<peopleNumber>" people, on "<date>"
       Then the booking is done
