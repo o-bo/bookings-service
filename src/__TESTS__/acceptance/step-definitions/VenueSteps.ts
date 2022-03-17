@@ -37,6 +37,28 @@ Given(/^there are venues:$/, async function (dataTable: DataTable) {
   assertAllVenuesAreEqual(allVenues, dataTable.hashes());
 });
 
-Given(/^there are available tables:$/, function (dataTable: DataTable) {
-  throw new Error('Not implemented yet');
+Given(/^there are available tables:$/, async function (dataTable: DataTable) {
+  const venueRepository: IVenueOutputPorts = this.venueRepository;
+
+  await Promise.all(
+    dataTable
+      .hashes()
+      .map(({ venueId, ...table }) =>
+        venueRepository
+          .findById(venueId)
+          .then((venue: Venue | undefined) => venue!.addTable(table))
+      )
+  );
+
+  const allVenues = await venueRepository.listVenues();
+  assert.equal(allVenues[0].tables.length, 2);
+  assert.equal(allVenues[0].tables[0].number, 1);
+  assert.equal(allVenues[0].tables[0].capacity, 4);
+  assert.equal(allVenues[0].tables[1].number, 2);
+  assert.equal(allVenues[0].tables[1].capacity, 6);
+  assert.equal(allVenues[1].tables.length, 2);
+  assert.equal(allVenues[1].tables[0].number, 1);
+  assert.equal(allVenues[1].tables[0].capacity, 2);
+  assert.equal(allVenues[1].tables[1].number, 2);
+  assert.equal(allVenues[1].tables[1].capacity, 4);
 });

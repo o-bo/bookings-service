@@ -12,4 +12,10 @@ export default class VenueInMemoryAdapter implements IVenueOutputPorts {
   listVenues(): Promise<Venue[]> {
     return Promise.resolve(this.venues);
   }
+
+  findById(venueId: string | number): Promise<Venue | undefined> {
+    return Promise.resolve(
+      this.venues.find((venue) => venueId === venue.id.toValue())
+    );
+  }
 }

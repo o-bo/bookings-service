@@ -8,11 +8,11 @@ Feature: Create a booking
       | abc | etoile      | 1 bis rue de l union 64600 Anglet        |
       | def | le triangle | 64 avenue des champs elysees 75000 Paris |
     Given there are available tables:
-      | id  |  | number | venueId | capacity |  |
-      | ghi |  | 1      | abc     | 4        |  |
-      | jkl |  | 2      | abc     | 6        |  |
-      | mno |  | 1      | def     | 2        |  |
-      | pqr |  | 2      | def     | 4        |  |
+      |  |  | number | venueId | capacity |  |
+      |  |  | 1      | abc     | 4        |  |
+      |  |  | 2      | abc     | 6        |  |
+      |  |  | 1      | def     | 2        |  |
+      |  |  | 2      | def     | 4        |  |
     Given there are customers:
       | id  | name           |
       | abc | Jean Rochefort |
