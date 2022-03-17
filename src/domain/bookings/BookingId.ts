@@ -17,7 +17,7 @@ export default class BookingId extends ValueObject<BookingIdProps> {
     super(props);
   }
 
-  public static create(id: string): Result<string, BookingId> {
+  public static create(id?: string): Result<string, BookingId> {
     const guardResult = Guard.combine([
       Guard.againstNullOrUndefined(id, 'id'),
       Guard.isUUID(id, 'id')
@@ -26,7 +26,7 @@ export default class BookingId extends ValueObject<BookingIdProps> {
     if (guardResult.failed) {
       return Result.fail(guardResult.message || DEFAULT_ERROR_MESSAGE);
     } else {
-      return Result.ok(new BookingId({ value: id }));
+      return Result.ok(new BookingId({ value: id as string }));
     }
   }
 }

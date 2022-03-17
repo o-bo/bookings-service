@@ -135,8 +135,8 @@ export default class Guard {
     }
   }
 
-  public static isUUID(string: string, argumentName: string): IGuardResult {
-    if (!validate(string)) {
+  public static isUUID(string?: string, argumentName?: string): IGuardResult {
+    if (string && !validate(string)) {
       return {
         failed: true,
         message: `${argumentName} is not a UUID`

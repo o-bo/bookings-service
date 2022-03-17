@@ -10,6 +10,7 @@ import BookingPersonName from './BookingPersonName';
 import BookingTableNumber from './BookingTableNumber';
 import BookingTotalBilled from './BookingTotalBilled';
 import BookingCreatedEvent from './events/BookingCreatedEvent';
+import BookingId from './BookingId';
 
 interface BookingProps {
   personName: BookingPersonName;
@@ -61,11 +62,19 @@ export default class Booking extends AggregateRoot<BookingProps> {
 
   private constructor(props: BookingProps, id?: UniqueEntityId) {
     super(props, id);
+
+    // If the id wasn't provided, it means that we're creating a new
+    // user, so we should create a UserCreatedEvent.
+    const idWasProvided = !!id;
+
+    if (!idWasProvided) {
+      this.addDomainEvent(new BookingCreatedEvent(this));
+    }
   }
 
   public static init(
     props: BookingDto,
-    id?: string | number
+    id?: string
   ): Result<IGuardResult, Booking> {
     const personNameOrError: Result<string, BookingPersonName> =
       BookingPersonName.create(props.personName);
@@ -91,6 +100,8 @@ export default class Booking extends AggregateRoot<BookingProps> {
       return Result.fail(guardResult.unwrap());
     }
 
+    const bookingIdOrError: Result<string, BookingId> = BookingId.create(id);
+
     const booking = new Booking(
       {
         personName: personNameOrError.unwrap(),
@@ -104,18 +115,11 @@ export default class Booking extends AggregateRoot<BookingProps> {
         createdAt: props.createdAt,
         updatedAt: props.updatedAt
       },
-      new BookingEntityId(id)
+      bookingIdOrError.unwrap(
+        (bId: BookingId) => new BookingEntityId(bId.value),
+        () => undefined
+      )
     );
-
-    // If the id wasn't provided, it means that we're creating a new
-    // user, so we should create a UserCreatedEvent.
-    const idWasProvided = !!id;
-
-    if (!idWasProvided) {
-      // Method from the AggregateRoot parent class. We'll look
-      // closer at this.
-      booking.addDomainEvent(new BookingCreatedEvent(booking));
-    }
 
     return Result.ok(booking);
   }
