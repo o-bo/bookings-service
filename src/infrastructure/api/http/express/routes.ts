@@ -4,7 +4,7 @@ import BookingPostgresAdapter from '../../../spi/storage/postgres/bookings/Booki
 import CreateBookingRestAdapter from './bookings/CreateBookingRestAdapter';
 import DeleteBookingRestAdapter from './bookings/DeleteBookingRestAdapter';
 import DeleteBookingInputPort from '../../../../application/bookings/ports/inputs/delete-booking/DeleteBookingInputPort';
-import { keysToCamel } from '../../../../framework/utils';
+import { keysToCamel } from '../../../../framework/utils/utils';
 import db from '../../../spi/storage/postgres';
 import CreateBookingInputPort from '../../../../application/bookings/ports/inputs/create-booking/CreateBookingInputPort';
 

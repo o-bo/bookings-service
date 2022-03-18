@@ -1,8 +1,8 @@
-import DomainEventsManager from './DomainEventsManager';
+import DomainEventsManager from '../domain-event/DomainEventsManager';
 
-import Entity from './Entity';
-import UniqueEntityID from './UniqueEntityId';
-import DomainEvent from './DomainEvent';
+import Entity from '../identity/Entity';
+import UniqueEntityID from '../identity/UniqueEntityId';
+import DomainEvent from '../domain-event/DomainEvent';
 
 export default abstract class AggregateRoot<ENT> extends Entity<ENT> {
   private _domainEvents: DomainEvent[] = [];

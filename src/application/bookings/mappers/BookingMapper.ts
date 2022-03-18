@@ -1,4 +1,4 @@
-import Mapper from '../../../framework/Mapper';
+import Mapper from '../../../framework/utils/Mapper';
 import Booking from '../../../domain/bookings/Booking';
 import BookingDto from '../../../domain/bookings/BookingDto';
 

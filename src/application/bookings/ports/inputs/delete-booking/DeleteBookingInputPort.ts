@@ -1,5 +1,5 @@
-import { UnexpectedError } from '../../../../../framework/GenericAppError';
-import Result from '../../../../../framework/Result';
+import { UnexpectedError } from '../../../../../framework/error/GenericAppError';
+import Result from '../../../../../framework/result/Result';
 import {
   BookingNotFoundError,
   InvalidBookingIdError

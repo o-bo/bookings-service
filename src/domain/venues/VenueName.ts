@@ -1,4 +1,4 @@
-import ValueObject from '../../framework/ValueObject';
+import ValueObject from '../../framework/value-object/ValueObject';
 
 interface VenueNameProps {
   value: string;

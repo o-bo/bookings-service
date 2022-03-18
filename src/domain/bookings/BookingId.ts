@@ -1,6 +1,6 @@
-import Guard from '../../framework/Guard';
-import Result from '../../framework/Result';
-import ValueObject from '../../framework/ValueObject';
+import Guard from '../../framework/guard/Guard';
+import Result from '../../framework/result/Result';
+import ValueObject from '../../framework/value-object/ValueObject';
 
 const DEFAULT_ERROR_MESSAGE = 'Booking Id is not valid';
 

@@ -1,5 +1,5 @@
-import UniqueEntityId from './UniqueEntityId';
-import AggregateRoot from './AggregateRoot';
+import UniqueEntityId from '../identity/UniqueEntityId';
+import AggregateRoot from '../aggregate/AggregateRoot';
 
 export default class DomainEvent {
   public dateTimeOccurred: Date;

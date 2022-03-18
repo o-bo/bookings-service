@@ -1,3 +1,3 @@
-import DomainEvent from '../../../framework/DomainEvent';
+import DomainEvent from '../../../framework/domain-event/DomainEvent';
 
 export default class BookingCreatedEvent extends DomainEvent {}

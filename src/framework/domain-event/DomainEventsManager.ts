@@ -1,6 +1,6 @@
 import DomainEvent from './DomainEvent';
-import AggregateRoot from './AggregateRoot';
-import UniqueEntityId from './UniqueEntityId';
+import AggregateRoot from '../aggregate/AggregateRoot';
+import UniqueEntityId from '../identity/UniqueEntityId';
 
 export default class DomainEventsManager {
   private static handlersMap: { [key: string]: any[] } = {};
