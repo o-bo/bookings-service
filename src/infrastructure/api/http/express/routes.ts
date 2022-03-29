@@ -1,12 +1,17 @@
-import express, { Request, Response, Router } from 'express';
-import { validate } from 'uuid';
-import BookingPostgresAdapter from '../../../spi/storage/postgres/bookings/BookingPostgresAdapter';
-import CreateBookingRestAdapter from './bookings/CreateBookingRestAdapter';
-import DeleteBookingRestAdapter from './bookings/DeleteBookingRestAdapter';
-import DeleteBookingInputPort from '../../../../application/bookings/ports/inputs/delete-booking/DeleteBookingInputPort';
-import { keysToCamel } from '../../../../framework/utils/utils';
-import db from '../../../spi/storage/postgres';
-import CreateBookingInputPort from '../../../../application/bookings/ports/inputs/create-booking/CreateBookingInputPort';
+import express, { Request, Response, Router } from "express";
+import { validate } from "uuid";
+import CreateBookingRestAdapter from "./bookings/CreateBookingRestAdapter";
+import DeleteBookingRestAdapter from "./bookings/DeleteBookingRestAdapter";
+import DeleteBookingInputPort
+  from "../../../../application/bookings/ports/inputs/delete-booking/DeleteBookingInputPort";
+import { keysToCamel } from "../../../../framework/utils/utils";
+import db from "../../../spi/repositories/postgres";
+import CreateBookingInputPort
+  from "../../../../application/bookings/ports/inputs/create-booking/CreateBookingInputPort";
+import PersistBookingPostgresAdapter from "../../../spi/repositories/postgres/bookings/PersistBookingPostgresAdapter";
+import DeleteBookingPostgresAdapter from "../../../spi/repositories/postgres/bookings/DeleteBookingPostgresAdapter";
+import FetchBookingByIdPostgresAdapter
+  from "../../../spi/repositories/postgres/bookings/FetchBookingByIdPostgresAdapter";
 
 const router: Router = express.Router();
 
@@ -168,11 +173,13 @@ router.delete(
     //   SERVICE_IDENTIFIER.DELETE_BOOKING_REST_ADAPTER
     // );
 
-    const bookingOutputPort = BookingPostgresAdapter.getInstance();
-    const deleteBookingInputPort = new DeleteBookingInputPort(
-      bookingOutputPort
+    const deleteBookingPostgresAdapter = DeleteBookingPostgresAdapter.getInstance();
+    const fetchBookingByIdPostgresAdapter = FetchBookingByIdPostgresAdapter.getInstance();
+    const deleteBookingAdapter = new DeleteBookingInputPort(
+      deleteBookingPostgresAdapter,
+      fetchBookingByIdPostgresAdapter
     );
-    const controller = new DeleteBookingRestAdapter(deleteBookingInputPort);
+    const controller = new DeleteBookingRestAdapter(deleteBookingAdapter);
     return controller.execute(req, res);
   })
 );
@@ -190,11 +197,11 @@ router.post(
     //   SERVICE_IDENTIFIER.CREATE_BOOKING_REST_ADAPTER
     // );
 
-    const bookingOutputPort = BookingPostgresAdapter.getInstance();
-    const createBookingInputPort = new CreateBookingInputPort(
-      bookingOutputPort
+    const createBookingPostgresAdapter = PersistBookingPostgresAdapter.getInstance();
+    const createBookingAdapter = new CreateBookingInputPort(
+      createBookingPostgresAdapter
     );
-    const controller = new CreateBookingRestAdapter(createBookingInputPort);
+    const controller = new CreateBookingRestAdapter(createBookingAdapter);
     return controller.execute(req, res);
   })
 );

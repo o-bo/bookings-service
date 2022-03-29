@@ -1,23 +1,23 @@
-import { UnexpectedError } from '../../../../../framework/error/GenericAppError';
-import Result from '../../../../../framework/result/Result';
-import {
-  BookingNotFoundError,
-  InvalidBookingIdError
-} from '../../../../../domain/bookings/BookingErrors';
-import BookingId from '../../../../../domain/bookings/BookingId';
-import DeleteBookingDto from '../../../useCases/delete-booking/DeleteBookingDto';
-import { DeleteBookingError } from '../../../useCases/delete-booking/DeleteBookingErrors';
-import IDeleteBookingUseCase from '../../../useCases/delete-booking/IDeleteBookingUseCase';
-import IBookingOutputPort from '../../outputs/IBookingOutputPort';
+import { UnexpectedError } from "../../../../../framework/error/GenericAppError";
+import Result from "../../../../../framework/result/Result";
+import { BookingNotFoundError, InvalidBookingIdError } from "../../../../../domain/bookings/BookingErrors";
+import BookingId from "../../../../../domain/bookings/BookingId";
+import DeleteBookingDto from "../../../useCases/delete-booking/DeleteBookingDto";
+import { DeleteBookingError } from "../../../useCases/delete-booking/DeleteBookingErrors";
+import IDeleteBookingUseCase from "../../../useCases/delete-booking/IDeleteBookingUseCase";
+import IDeleteBookingOutputPort from "../../outputs/IDeleteBookingOutputPort";
+import IFetchBookingByIdOutputPort from "../../outputs/IFetchBookingByIdOutputPort";
 
 export default class DeleteBookingInputPort implements IDeleteBookingUseCase {
-  protected readonly bookingOutputPort: IBookingOutputPort;
+  protected readonly deleteBookingOutputPort: IDeleteBookingOutputPort;
+  protected readonly fetchBookingByIdOutputPort: IFetchBookingByIdOutputPort;
 
-  constructor(bookingOutputPort: IBookingOutputPort) {
-    this.bookingOutputPort = bookingOutputPort;
+  constructor(deleteBookingOutputPort: IDeleteBookingOutputPort, fetchBookingByIdOutputPort: IFetchBookingByIdOutputPort) {
+    this.deleteBookingOutputPort = deleteBookingOutputPort;
+    this.fetchBookingByIdOutputPort = fetchBookingByIdOutputPort;
   }
 
-  async deleteBooking(
+  async handle(
     deleteBookingDTO: DeleteBookingDto
   ): Promise<Result<DeleteBookingError, BookingId>> {
     const bookingIdOrError = BookingId.create(deleteBookingDTO.id);
@@ -27,7 +27,7 @@ export default class DeleteBookingInputPort implements IDeleteBookingUseCase {
     }
 
     try {
-      const bookingOrError = await this.bookingOutputPort.fetchBookingById(
+      const bookingOrError = await this.fetchBookingByIdOutputPort.fetchBookingById(
         bookingIdOrError.unwrap()
       );
 
@@ -39,7 +39,7 @@ export default class DeleteBookingInputPort implements IDeleteBookingUseCase {
         );
       }
 
-      await this.bookingOutputPort.deleteBooking(bookingOrError.unwrap());
+      await this.deleteBookingOutputPort.deleteBooking(bookingOrError.unwrap());
 
       return Result.ok(bookingIdOrError.unwrap());
     } catch (err: any) {

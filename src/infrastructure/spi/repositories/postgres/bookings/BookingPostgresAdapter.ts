@@ -1,12 +1,14 @@
-import db from '../index';
-import { IGuardResult } from '../../../../../framework/guard/Guard';
-import Result from '../../../../../framework/result/Result';
-import Booking from '../../../../../domain/bookings/Booking';
-import BookingId from '../../../../../domain/bookings/BookingId';
-import BookingMapper from '../../../../../application/bookings/mappers/BookingMapper';
-import IBookingOutputPort from '../../../../../application/bookings/ports/outputs/IBookingOutputPort';
+import db from "../index";
+import { IGuardResult } from "../../../../../framework/guard/Guard";
+import Result from "../../../../../framework/result/Result";
+import Booking from "../../../../../domain/bookings/Booking";
+import BookingId from "../../../../../domain/bookings/BookingId";
+import BookingMapper from "../../../../../application/bookings/mappers/BookingMapper";
+import IFetchBookingByIdOutputPort from "../../../../../application/bookings/ports/outputs/IFetchBookingByIdOutputPort";
+import IPersistBookingOutputPort from "../../../../../application/bookings/ports/outputs/IPersistBookingOutputPort";
+import IDeleteBookingOutputPort from "../../../../../application/bookings/ports/outputs/IDeleteBookingOutputPort";
 
-export default class BookingPostgresAdapter implements IBookingOutputPort {
+export default class BookingPostgresAdapter implements IFetchBookingByIdOutputPort, IPersistBookingOutputPort, IDeleteBookingOutputPort {
   private static instance: BookingPostgresAdapter;
 
   public static getInstance() {

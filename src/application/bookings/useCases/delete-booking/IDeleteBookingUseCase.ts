@@ -1,10 +1,7 @@
-import Result from '../../../../framework/result/Result';
 import BookingId from '../../../../domain/bookings/BookingId';
 import DeleteBookingDto from './DeleteBookingDto';
 import { DeleteBookingError } from './DeleteBookingErrors';
+import IUseCase from '../../../../framework/use-case/IUseCase';
 
-export default interface IDeleteBookingUseCase {
-  deleteBooking(
-    deleteBookingDTO: DeleteBookingDto
-  ): Promise<Result<DeleteBookingError, BookingId>>;
-}
+export default interface IDeleteBookingUseCase
+  extends IUseCase<DeleteBookingDto, DeleteBookingError, BookingId> {}

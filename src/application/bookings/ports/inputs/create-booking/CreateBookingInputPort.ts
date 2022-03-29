@@ -1,21 +1,21 @@
-import ICreateBookingUseCase from '../../../useCases/create-booking/ICreateBookingUseCase';
-import IBookingOutputPort from '../../outputs/IBookingOutputPort';
-import CreateBookingDto from '../../../useCases/create-booking/CreateBookingDto';
-import Result from '../../../../../framework/result/Result';
-import { CreateBookingError } from '../../../useCases/create-booking/CreateBookingErrors';
-import Booking from '../../../../../domain/bookings/Booking';
-import { InvalidBookingError } from '../../../../../domain/bookings/BookingErrors';
-import { UnexpectedError } from '../../../../../framework/error/GenericAppError';
-import DomainEventsManager from '../../../../../framework/domain-event/DomainEventsManager';
+import ICreateBookingUseCase from "../../../useCases/create-booking/ICreateBookingUseCase";
+import CreateBookingDto from "../../../useCases/create-booking/CreateBookingDto";
+import Result from "../../../../../framework/result/Result";
+import { CreateBookingError } from "../../../useCases/create-booking/CreateBookingErrors";
+import Booking from "../../../../../domain/bookings/Booking";
+import { InvalidBookingError } from "../../../../../domain/bookings/BookingErrors";
+import { UnexpectedError } from "../../../../../framework/error/GenericAppError";
+import DomainEventsManager from "../../../../../framework/domain-event/DomainEventsManager";
+import IPersistBookingOutputPort from "../../outputs/IPersistBookingOutputPort";
 
 export default class CreateBookingInputPort implements ICreateBookingUseCase {
-  protected readonly bookingOutputPort: IBookingOutputPort;
+  protected readonly persistBookingOutputPort: IPersistBookingOutputPort;
 
-  constructor(bookingOutputPort: IBookingOutputPort) {
-    this.bookingOutputPort = bookingOutputPort;
+  constructor(persistBookingOutputPort: IPersistBookingOutputPort) {
+    this.persistBookingOutputPort = persistBookingOutputPort;
   }
 
-  async createBooking(
+  async handle(
     createBookingDTO: CreateBookingDto
   ): Promise<Result<CreateBookingError, Booking>> {
     const bookingOrError = Booking.init(createBookingDTO);
@@ -25,7 +25,7 @@ export default class CreateBookingInputPort implements ICreateBookingUseCase {
     }
 
     try {
-      const createdBooking = await this.bookingOutputPort.persistBooking(
+      const createdBooking = await this.persistBookingOutputPort.persistBooking(
         bookingOrError.unwrap()
       );
 

@@ -42,7 +42,7 @@ export default class DeleteBookingRestAdapter extends RestExpressAdapter<
 
   async executeImpl(dto: DeleteBookingDto): Promise<any> {
     try {
-      const result = await this.bookingInputPort.deleteBooking(dto);
+      const result = await this.bookingInputPort.handle(dto);
       return result.unwrap(
         this.processResult.bind(this),
         this.processError.bind(this)

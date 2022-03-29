@@ -35,7 +35,7 @@ export default class CreateBookingRestAdapter extends RestExpressAdapter<
 
   async executeImpl(dto: CreateBookingDto): Promise<any> {
     try {
-      const result = await this.bookingInputPort.createBooking(dto);
+      const result = await this.bookingInputPort.handle(dto);
       return result.unwrap(
         this.processResult.bind(this),
         this.processError.bind(this)
