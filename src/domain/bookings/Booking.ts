@@ -11,6 +11,7 @@ import BookingTableNumber from './BookingTableNumber';
 import BookingTotalBilled from './BookingTotalBilled';
 import BookingCreatedEvent from './events/BookingCreatedEvent';
 import BookingId from './BookingId';
+import Timestamp from '../../framework/timestamps/timestamp';
 
 interface BookingProps {
   personName: BookingPersonName;
@@ -19,8 +20,6 @@ interface BookingProps {
   tableNumber: BookingTableNumber;
   openedStatus: boolean;
   totalBilled?: BookingTotalBilled;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
 export default class Booking extends AggregateRoot<BookingProps> {
@@ -52,16 +51,13 @@ export default class Booking extends AggregateRoot<BookingProps> {
     return this.props.totalBilled;
   }
 
-  get createdAt(): string | undefined {
-    return this.props.createdAt;
-  }
-
-  get updatedAt(): string | undefined {
-    return this.props.updatedAt;
-  }
-
-  private constructor(props: BookingProps, id?: UniqueEntityId) {
-    super(props, id);
+  private constructor(
+    props: BookingProps,
+    id?: UniqueEntityId,
+    createdAt?: Timestamp,
+    updatedAt?: Timestamp
+  ) {
+    super(props, id, createdAt, updatedAt);
 
     // If the id wasn't provided, it means that we're creating a new
     // user, so we should create a UserCreatedEvent.
@@ -74,7 +70,9 @@ export default class Booking extends AggregateRoot<BookingProps> {
 
   public static init(
     props: BookingDto,
-    id?: string
+    id?: string,
+    createdAt?: Timestamp,
+    updatedAt?: Timestamp
   ): Result<IGuardResult, Booking> {
     const personNameOrError: Result<string, BookingPersonName> =
       BookingPersonName.create(props.personName);
@@ -111,16 +109,44 @@ export default class Booking extends AggregateRoot<BookingProps> {
         ...(totalBilledOrError.unwrap() && {
           totalBilled: totalBilledOrError.unwrap()
         }),
-        openedStatus: false,
-        createdAt: props.createdAt,
-        updatedAt: props.updatedAt
+        openedStatus: false
       },
       bookingIdOrError.unwrap(
         (bId: BookingId) => new BookingEntityId(bId.value),
         () => undefined
-      )
+      ),
+      createdAt,
+      updatedAt
     );
 
     return Result.ok(booking);
+  }
+
+  toDto(): BookingDto {
+    return {
+      id: this.id.toValue(),
+      personName: this.personName.value,
+      peopleNumber: this.peopleNumber.value,
+      date: this.date.value,
+      tableNumber: this.tableNumber.value,
+      openedStatus: this.openedStatus,
+      totalBilled: this.totalBilled?.value,
+      createdAt: this.createdAt.toString(),
+      updatedAt: this.updatedAt.toString()
+    } as BookingDto;
+  }
+
+  toPersistence(): any {
+    return {
+      id: this.id.toString(),
+      person_name: this.personName.value,
+      people_number: this.peopleNumber.value,
+      date: this.date.value,
+      table_number: this.tableNumber.value,
+      opened_status: this.openedStatus,
+      total_billed: this.totalBilled?.value,
+      created_at: this.createdAt.toString(),
+      updated_at: this.updatedAt.toString()
+    };
   }
 }

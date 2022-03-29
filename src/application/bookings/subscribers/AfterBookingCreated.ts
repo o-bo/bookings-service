@@ -14,7 +14,7 @@ export default class AfterBookingCreated implements IHandleDomainEvent {
 
     try {
       // Do whatever necessary like publish on pub/sub system or send slack message
-      console.log('Booking Created !!!', entity);
+      console.log('Booking Created !!!', entity.toDto());
     } catch (err) {}
   }
 

@@ -1,7 +1,6 @@
 import RestExpressAdapter from '../RestExpressAdapter';
 import Booking from '../../../../../domain/bookings/Booking';
 import { InvalidBookingError } from '../../../../../domain/bookings/BookingErrors';
-import BookingMapper from '../../../../../application/bookings/mappers/BookingMapper';
 import CreateBookingInputPort from '../../../../../application/bookings/ports/inputs/create-booking/CreateBookingInputPort';
 import CreateBookingDto from '../../../../../application/bookings/useCases/create-booking/CreateBookingDto';
 import { CreateBookingError } from '../../../../../application/bookings/useCases/create-booking/CreateBookingErrors';
@@ -18,7 +17,7 @@ export default class CreateBookingRestAdapter extends RestExpressAdapter<
     this.bookingInputPort = bookingInputPort;
   }
 
-  processErrorImpl(createBookingError: CreateBookingError) {
+  concreteError(createBookingError: CreateBookingError) {
     switch (createBookingError.constructor) {
       case InvalidBookingError: {
         return this.unprocessable(createBookingError);
@@ -29,17 +28,14 @@ export default class CreateBookingRestAdapter extends RestExpressAdapter<
     }
   }
 
-  processResultImpl(createdBooking: Booking) {
-    return this.created(BookingMapper.get().fromDomainToDto(createdBooking));
+  concreteResponse(createdBooking: Booking) {
+    return this.created(createdBooking.toDto());
   }
 
-  async executeImpl(dto: CreateBookingDto): Promise<any> {
+  async concreteResult(dto: CreateBookingDto): Promise<any> {
     try {
-      const result = await this.bookingInputPort.handle(dto);
-      return result.unwrap(
-        this.processResult.bind(this),
-        this.processError.bind(this)
-      );
+      const result = await this.bookingInputPort.result(dto);
+      return result.unwrap(this.response.bind(this), this.error.bind(this));
     } catch (err: any) {
       return this.fail(err);
     }

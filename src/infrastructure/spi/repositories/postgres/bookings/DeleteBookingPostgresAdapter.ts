@@ -3,17 +3,17 @@ import Booking from "../../../../../domain/bookings/Booking";
 import IDeleteBookingOutputPort from "../../../../../application/bookings/ports/outputs/IDeleteBookingOutputPort";
 
 export default class DeleteBookingPostgresAdapter implements IDeleteBookingOutputPort {
-  private static instance: DeleteBookingPostgresAdapter;
+  private static _instance: DeleteBookingPostgresAdapter;
 
-  public static getInstance() {
-    if (!DeleteBookingPostgresAdapter.instance) {
-      this.instance = new DeleteBookingPostgresAdapter();
+  public static instance() {
+    if (!DeleteBookingPostgresAdapter._instance) {
+      this._instance = new DeleteBookingPostgresAdapter();
     }
-    return this.instance;
+    return this._instance;
   }
 
-  deleteBooking(booking: Booking): Promise<number> {
-    return db('bookings')
+  async deleteBooking(booking: Booking): Promise<void> {
+    await db('bookings')
       .where({
         id: booking.id.toValue()
       })

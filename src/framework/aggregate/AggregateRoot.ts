@@ -3,12 +3,21 @@ import DomainEventsManager from '../domain-event/DomainEventsManager';
 import Entity from '../identity/Entity';
 import UniqueEntityID from '../identity/UniqueEntityId';
 import DomainEvent from '../domain-event/DomainEvent';
+import Timestamp from '../timestamps/timestamp';
 
 export default abstract class AggregateRoot<ENT> extends Entity<ENT> {
   private _domainEvents: DomainEvent[] = [];
 
   get id(): UniqueEntityID {
     return this._id;
+  }
+
+  get createdAt(): Timestamp {
+    return this._createdAt;
+  }
+
+  get updatedAt(): Timestamp {
+    return this._updatedAt;
   }
 
   get domainEvents(): DomainEvent[] {

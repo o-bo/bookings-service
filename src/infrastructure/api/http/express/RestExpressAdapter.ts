@@ -1,5 +1,5 @@
-import * as express from 'express';
-import UseCaseError from '../../../../framework/error/UseCaseError';
+import * as express from "express";
+import UseCaseError from "../../../../framework/error/UseCaseError";
 
 export default abstract class RestExpressAdapter<DTO, ENT, ERR> {
   // or even private
@@ -7,24 +7,24 @@ export default abstract class RestExpressAdapter<DTO, ENT, ERR> {
 
   protected res!: express.Response;
 
-  protected error!: ERR;
+  protected _error!: ERR;
 
   protected resultEntity!: ENT;
 
-  protected abstract processErrorImpl(error: ERR): any;
-  protected processError(error: ERR): any {
-    this.error = error;
-    return this.processErrorImpl(this.error);
+  protected abstract concreteError(error: ERR): any;
+  protected error(error: ERR): any {
+    this._error = error;
+    return this.concreteError(this._error);
   }
 
-  protected abstract processResultImpl(resultEntity: ENT): any;
-  protected processResult(resultEntity: ENT): any {
+  protected abstract concreteResponse(resultEntity: ENT): any;
+  protected response(resultEntity: ENT): any {
     this.resultEntity = resultEntity;
-    return this.processResultImpl(this.resultEntity);
+    return this.concreteResponse(this.resultEntity);
   }
 
-  protected abstract executeImpl(params: DTO): Promise<void | any>;
-  public execute(
+  protected abstract concreteResult(params: DTO): Promise<void | any>;
+  public result(
     req: express.Request,
     res: express.Response
   ): Promise<void | any> {
@@ -37,7 +37,7 @@ export default abstract class RestExpressAdapter<DTO, ENT, ERR> {
       ...this.req.body
     };
 
-    return this.executeImpl(params);
+    return this.concreteResult(params);
   }
 
   public static jsonResponse(

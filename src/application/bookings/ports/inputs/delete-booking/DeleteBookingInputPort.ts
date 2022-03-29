@@ -17,7 +17,7 @@ export default class DeleteBookingInputPort implements IDeleteBookingUseCase {
     this.fetchBookingByIdOutputPort = fetchBookingByIdOutputPort;
   }
 
-  async handle(
+  async result(
     deleteBookingDTO: DeleteBookingDto
   ): Promise<Result<DeleteBookingError, BookingId>> {
     const bookingIdOrError = BookingId.create(deleteBookingDTO.id);

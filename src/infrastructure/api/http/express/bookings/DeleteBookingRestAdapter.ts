@@ -1,12 +1,10 @@
-import RestExpressAdapter from '../RestExpressAdapter';
-import {
-  BookingNotFoundError,
-  InvalidBookingIdError
-} from '../../../../../domain/bookings/BookingErrors';
-import BookingId from '../../../../../domain/bookings/BookingId';
-import DeleteBookingInputPort from '../../../../../application/bookings/ports/inputs/delete-booking/DeleteBookingInputPort';
-import DeleteBookingDto from '../../../../../application/bookings/useCases/delete-booking/DeleteBookingDto';
-import { DeleteBookingError } from '../../../../../application/bookings/useCases/delete-booking/DeleteBookingErrors';
+import RestExpressAdapter from "../RestExpressAdapter";
+import { BookingNotFoundError, InvalidBookingIdError } from "../../../../../domain/bookings/BookingErrors";
+import BookingId from "../../../../../domain/bookings/BookingId";
+import DeleteBookingInputPort
+  from "../../../../../application/bookings/ports/inputs/delete-booking/DeleteBookingInputPort";
+import DeleteBookingDto from "../../../../../application/bookings/useCases/delete-booking/DeleteBookingDto";
+import { DeleteBookingError } from "../../../../../application/bookings/useCases/delete-booking/DeleteBookingErrors";
 
 export default class DeleteBookingRestAdapter extends RestExpressAdapter<
   DeleteBookingDto,
@@ -20,7 +18,7 @@ export default class DeleteBookingRestAdapter extends RestExpressAdapter<
     this.bookingInputPort = bookingInputPort;
   }
 
-  protected processErrorImpl(error: DeleteBookingError) {
+  protected concreteError(error: DeleteBookingError) {
     switch (error.constructor) {
       case BookingNotFoundError: {
         return this.notFound(error);
@@ -34,18 +32,18 @@ export default class DeleteBookingRestAdapter extends RestExpressAdapter<
     }
   }
 
-  protected processResultImpl(deletedBookingId: BookingId) {
+  protected concreteResponse(deletedBookingId: BookingId) {
     return this.ok({
       id: deletedBookingId.value
     } as DeleteBookingDto);
   }
 
-  async executeImpl(dto: DeleteBookingDto): Promise<any> {
+  async concreteResult(dto: DeleteBookingDto): Promise<any> {
     try {
-      const result = await this.bookingInputPort.handle(dto);
+      const result = await this.bookingInputPort.result(dto);
       return result.unwrap(
-        this.processResult.bind(this),
-        this.processError.bind(this)
+        this.response.bind(this),
+        this.error.bind(this)
       );
     } catch (err: any) {
       return this.fail(err);

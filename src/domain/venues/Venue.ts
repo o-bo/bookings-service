@@ -53,4 +53,15 @@ export default class Venue extends AggregateRoot<VenueProps> {
       new VenueEntityId(id)
     );
   }
+
+  toDto(): VenueDto {
+    return {
+      name: this.name.toValue(),
+      address: this.address.toValue()
+    };
+  }
+
+  toPersistence(): any {
+    return {};
+  }
 }

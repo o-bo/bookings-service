@@ -173,14 +173,14 @@ router.delete(
     //   SERVICE_IDENTIFIER.DELETE_BOOKING_REST_ADAPTER
     // );
 
-    const deleteBookingPostgresAdapter = DeleteBookingPostgresAdapter.getInstance();
-    const fetchBookingByIdPostgresAdapter = FetchBookingByIdPostgresAdapter.getInstance();
-    const deleteBookingAdapter = new DeleteBookingInputPort(
+    const deleteBookingPostgresAdapter = DeleteBookingPostgresAdapter.instance();
+    const fetchBookingByIdPostgresAdapter = FetchBookingByIdPostgresAdapter.instance();
+    const deleteBookingInputPort = new DeleteBookingInputPort(
       deleteBookingPostgresAdapter,
       fetchBookingByIdPostgresAdapter
     );
-    const controller = new DeleteBookingRestAdapter(deleteBookingAdapter);
-    return controller.execute(req, res);
+    const controller = new DeleteBookingRestAdapter(deleteBookingInputPort);
+    return controller.result(req, res);
   })
 );
 
@@ -197,12 +197,12 @@ router.post(
     //   SERVICE_IDENTIFIER.CREATE_BOOKING_REST_ADAPTER
     // );
 
-    const createBookingPostgresAdapter = PersistBookingPostgresAdapter.getInstance();
-    const createBookingAdapter = new CreateBookingInputPort(
+    const createBookingPostgresAdapter = PersistBookingPostgresAdapter.instance();
+    const createBookingInputPort = new CreateBookingInputPort(
       createBookingPostgresAdapter
     );
-    const controller = new CreateBookingRestAdapter(createBookingAdapter);
-    return controller.execute(req, res);
+    const controller = new CreateBookingRestAdapter(createBookingInputPort);
+    return controller.result(req, res);
   })
 );
 
