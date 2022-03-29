@@ -1,11 +1,11 @@
 /* global beforeEach describe it expect */
-import { knex } from "knex";
-import request from "supertest";
-import { v4 } from "uuid";
-import app from "../infrastructure/api/http/express";
-import dbConfig from "../infrastructure/spi/repositories/postgres/knexfile";
+import { knex } from 'knex';
+import request from 'supertest';
+import { v4 } from 'uuid';
+import app from '../infrastructure/api/http/express';
+import dbConfig from '../infrastructure/spi/repositories/postgres/knexfile';
 
-import "../application/bookings";
+import '../bounded-contexts/bookings/application';
 
 const db = knex(dbConfig);
 

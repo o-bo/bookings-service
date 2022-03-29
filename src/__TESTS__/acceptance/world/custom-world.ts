@@ -1,6 +1,6 @@
-import IVenueOutputPorts from "../../../application/venues/ports/outputs/IVenueOutputPort";
-import { World } from "@cucumber/cucumber";
-import VenueInMemoryAdapter from "../../../infrastructure/spi/repositories/in-memory/venues/VenueInMemoryAdapter";
+import IVenueOutputPorts from '../../../bounded-contexts/venues/application/ports/outputs/IVenueOutputPort';
+import { World } from '@cucumber/cucumber';
+import VenueInMemoryAdapter from '../../../bounded-contexts/venues/repositories/in-memory/venues/VenueInMemoryAdapter';
 
 export interface CucumberWorldConstructorParams {
   venueRepository: IVenueOutputPorts;

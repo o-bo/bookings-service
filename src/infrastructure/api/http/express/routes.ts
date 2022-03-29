@@ -1,17 +1,14 @@
-import express, { Request, Response, Router } from "express";
-import { validate } from "uuid";
-import CreateBookingRestAdapter from "./bookings/CreateBookingRestAdapter";
-import DeleteBookingRestAdapter from "./bookings/DeleteBookingRestAdapter";
-import DeleteBookingInputPort
-  from "../../../../application/bookings/ports/inputs/delete-booking/DeleteBookingInputPort";
-import { keysToCamel } from "../../../../framework/utils/utils";
-import db from "../../../spi/repositories/postgres";
-import CreateBookingInputPort
-  from "../../../../application/bookings/ports/inputs/create-booking/CreateBookingInputPort";
-import PersistBookingPostgresAdapter from "../../../spi/repositories/postgres/bookings/PersistBookingPostgresAdapter";
-import DeleteBookingPostgresAdapter from "../../../spi/repositories/postgres/bookings/DeleteBookingPostgresAdapter";
-import FetchBookingByIdPostgresAdapter
-  from "../../../spi/repositories/postgres/bookings/FetchBookingByIdPostgresAdapter";
+import express, { Request, Response, Router } from 'express';
+import { validate } from 'uuid';
+import CreateBookingExpressAdapter from '../../../../bounded-contexts/bookings/infrastructure/api/express/CreateBookingExpressAdapter';
+import DeleteBookingExpressAdapter from '../../../../bounded-contexts/bookings/infrastructure/api/express/DeleteBookingExpressAdapter';
+import DeleteBookingInputPort from '../../../../bounded-contexts/bookings/application/ports/inputs/delete-booking/DeleteBookingInputPort';
+import { keysToCamel } from '../../../../framework/utils/utils';
+import db from '../../../spi/repositories/postgres';
+import CreateBookingInputPort from '../../../../bounded-contexts/bookings/application/ports/inputs/create-booking/CreateBookingInputPort';
+import PersistBookingPostgresAdapter from '../../../../bounded-contexts/bookings/infrastructure/spi/repositories/postgres/PersistBookingPostgresAdapter';
+import DeleteBookingPostgresAdapter from '../../../../bounded-contexts/bookings/infrastructure/spi/repositories/postgres/DeleteBookingPostgresAdapter';
+import FetchBookingByIdPostgresAdapter from '../../../../bounded-contexts/bookings/infrastructure/spi/repositories/postgres/FetchBookingByIdPostgresAdapter';
 
 const router: Router = express.Router();
 
@@ -173,13 +170,15 @@ router.delete(
     //   SERVICE_IDENTIFIER.DELETE_BOOKING_REST_ADAPTER
     // );
 
-    const deleteBookingPostgresAdapter = DeleteBookingPostgresAdapter.instance();
-    const fetchBookingByIdPostgresAdapter = FetchBookingByIdPostgresAdapter.instance();
+    const deleteBookingPostgresAdapter =
+      DeleteBookingPostgresAdapter.instance();
+    const fetchBookingByIdPostgresAdapter =
+      FetchBookingByIdPostgresAdapter.instance();
     const deleteBookingInputPort = new DeleteBookingInputPort(
       deleteBookingPostgresAdapter,
       fetchBookingByIdPostgresAdapter
     );
-    const controller = new DeleteBookingRestAdapter(deleteBookingInputPort);
+    const controller = new DeleteBookingExpressAdapter(deleteBookingInputPort);
     return controller.result(req, res);
   })
 );
@@ -197,11 +196,12 @@ router.post(
     //   SERVICE_IDENTIFIER.CREATE_BOOKING_REST_ADAPTER
     // );
 
-    const createBookingPostgresAdapter = PersistBookingPostgresAdapter.instance();
+    const createBookingPostgresAdapter =
+      PersistBookingPostgresAdapter.instance();
     const createBookingInputPort = new CreateBookingInputPort(
       createBookingPostgresAdapter
     );
-    const controller = new CreateBookingRestAdapter(createBookingInputPort);
+    const controller = new CreateBookingExpressAdapter(createBookingInputPort);
     return controller.result(req, res);
   })
 );

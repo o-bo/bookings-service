@@ -2,9 +2,9 @@ import assert from 'node:assert';
 
 import { DataTable, Given, setWorldConstructor } from '@cucumber/cucumber';
 
-import Venue from '../../../domain/venues/Venue';
+import Venue from '../../../bounded-contexts/venues/domain/Venue';
 import { CustomWorld } from '../world';
-import IVenueOutputPorts from '../../../application/venues/ports/outputs/IVenueOutputPort';
+import IVenueOutputPorts from '../../../bounded-contexts/venues/application/ports/outputs/IVenueOutputPort';
 
 setWorldConstructor(CustomWorld);
 
