@@ -2,8 +2,8 @@
 import { knex } from 'knex';
 import request from 'supertest';
 import { v4 } from 'uuid';
-import app from '../infrastructure/api/http/express';
-import dbConfig from '../infrastructure/spi/repositories/postgres/knexfile';
+import app from '../bounded-contexts/bookings/infrastructure/api/http/express';
+import dbConfig from '../bounded-contexts/bookings/infrastructure/spi/repositories/postgres/knexfile';
 
 import '../bounded-contexts/bookings/application';
 

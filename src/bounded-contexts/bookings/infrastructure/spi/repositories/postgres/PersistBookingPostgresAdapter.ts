@@ -1,4 +1,4 @@
-import db from '../../../../../../infrastructure/spi/repositories/postgres';
+import db from './index';
 import Booking from '../../../../domain/Booking';
 import IPersistBookingInRepository from '../../../../application/ports/outputs/IPersistBookingInRepository';
 

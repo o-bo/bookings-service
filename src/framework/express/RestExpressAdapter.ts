@@ -1,5 +1,5 @@
-import * as express from "express";
-import UseCaseError from "../../../../framework/error/UseCaseError";
+import * as express from 'express';
+import UseCaseError from '../error/UseCaseError';
 
 export default abstract class RestExpressAdapter<DTO, ENT, ERR> {
   // or even private

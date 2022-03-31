@@ -1,14 +1,14 @@
 import express, { Request, Response, Router } from 'express';
 import { validate } from 'uuid';
-import CreateBookingExpressAdapter from '../../../../bounded-contexts/bookings/infrastructure/api/express/CreateBookingExpressAdapter';
-import DeleteBookingExpressAdapter from '../../../../bounded-contexts/bookings/infrastructure/api/express/DeleteBookingExpressAdapter';
-import DeleteBookingInputPort from '../../../../bounded-contexts/bookings/application/ports/inputs/delete-booking/DeleteBookingInputPort';
-import { keysToCamel } from '../../../../framework/utils/utils';
+import CreateBookingExpressAdapter from './routes/CreateBookingExpressAdapter';
+import DeleteBookingExpressAdapter from './routes/DeleteBookingExpressAdapter';
+import DeleteBookingInputPort from '../../../../application/ports/inputs/delete-booking/DeleteBookingInputPort';
+import { keysToCamel } from '../../../../../../framework/utils/utils';
 import db from '../../../spi/repositories/postgres';
-import CreateBookingInputPort from '../../../../bounded-contexts/bookings/application/ports/inputs/create-booking/CreateBookingInputPort';
-import PersistBookingPostgresAdapter from '../../../../bounded-contexts/bookings/infrastructure/spi/repositories/postgres/PersistBookingPostgresAdapter';
-import DeleteBookingPostgresAdapter from '../../../../bounded-contexts/bookings/infrastructure/spi/repositories/postgres/DeleteBookingPostgresAdapter';
-import FetchBookingByIdPostgresAdapter from '../../../../bounded-contexts/bookings/infrastructure/spi/repositories/postgres/FetchBookingByIdPostgresAdapter';
+import CreateBookingInputPort from '../../../../application/ports/inputs/create-booking/CreateBookingInputPort';
+import PersistBookingPostgresAdapter from '../../../spi/repositories/postgres/PersistBookingPostgresAdapter';
+import DeleteBookingPostgresAdapter from '../../../spi/repositories/postgres/DeleteBookingPostgresAdapter';
+import FetchBookingByIdPostgresAdapter from '../../../spi/repositories/postgres/FetchBookingByIdPostgresAdapter';
 
 const router: Router = express.Router();
 

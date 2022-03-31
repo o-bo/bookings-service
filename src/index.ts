@@ -1,3 +1,3 @@
 import './bounded-contexts/bookings/application';
 
-import './infrastructure/api/http';
+import './bounded-contexts/bookings/infrastructure/api/http';
