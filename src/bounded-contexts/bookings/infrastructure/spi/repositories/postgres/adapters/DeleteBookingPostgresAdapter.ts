@@ -1,6 +1,6 @@
-import db from './index';
-import Booking from '../../../../domain/Booking';
-import IDeleteBookingFromRepository from '../../../../application/ports/outputs/IDeleteBookingFromRepository';
+import db from '../index';
+import Booking from '../../../../../domain/Booking';
+import IDeleteBookingFromRepository from '../../../../../application/ports/outputs/IDeleteBookingFromRepository';
 
 export default class DeleteBookingPostgresAdapter
   implements IDeleteBookingFromRepository

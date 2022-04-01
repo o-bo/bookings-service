@@ -6,9 +6,9 @@ import DeleteBookingInputPort from '../../../../application/ports/inputs/delete-
 import { keysToCamel } from '../../../../../../framework/utils/utils';
 import db from '../../../spi/repositories/postgres';
 import CreateBookingInputPort from '../../../../application/ports/inputs/create-booking/CreateBookingInputPort';
-import PersistBookingPostgresAdapter from '../../../spi/repositories/postgres/PersistBookingPostgresAdapter';
-import DeleteBookingPostgresAdapter from '../../../spi/repositories/postgres/DeleteBookingPostgresAdapter';
-import FetchBookingByIdPostgresAdapter from '../../../spi/repositories/postgres/FetchBookingByIdPostgresAdapter';
+import PersistBookingPostgresAdapter from '../../../spi/repositories/postgres/adapters/PersistBookingPostgresAdapter';
+import DeleteBookingPostgresAdapter from '../../../spi/repositories/postgres/adapters/DeleteBookingPostgresAdapter';
+import FetchBookingByIdPostgresAdapter from '../../../spi/repositories/postgres/adapters/FetchBookingByIdPostgresAdapter';
 
 const router: Router = express.Router();
 

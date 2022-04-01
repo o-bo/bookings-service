@@ -1,6 +1,6 @@
-import db from './index';
-import Booking from '../../../../domain/Booking';
-import IPersistBookingInRepository from '../../../../application/ports/outputs/IPersistBookingInRepository';
+import db from '../index';
+import Booking from '../../../../../domain/Booking';
+import IPersistBookingInRepository from '../../../../../application/ports/outputs/IPersistBookingInRepository';
 
 export default class PersistBookingPostgresAdapter
   implements IPersistBookingInRepository

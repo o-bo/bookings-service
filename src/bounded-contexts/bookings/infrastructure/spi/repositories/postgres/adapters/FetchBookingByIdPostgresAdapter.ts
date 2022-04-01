@@ -1,9 +1,9 @@
-import db from './index';
-import Result from '../../../../../../framework/result/Result';
-import Booking from '../../../../domain/Booking';
-import BookingId from '../../../../domain/BookingId';
-import IFetchBookingByIdFromRepository from '../../../../application/ports/outputs/IFetchBookingByIdFromRepository';
-import { InvalidBookingError } from '../../../../domain/BookingErrors';
+import db from '../index';
+import Result from '../../../../../../../framework/result/Result';
+import Booking from '../../../../../domain/Booking';
+import BookingId from '../../../../../domain/BookingId';
+import IFetchBookingByIdFromRepository from '../../../../../application/ports/outputs/IFetchBookingByIdFromRepository';
+import { InvalidBookingError } from '../../../../../domain/BookingErrors';
 
 export default class FetchBookingByIdPostgresAdapter
   implements IFetchBookingByIdFromRepository
