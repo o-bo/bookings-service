@@ -172,7 +172,7 @@ describe('testing-server-routes', () => {
       date: '2021-10-10',
       tableNumber: 42,
       openedStatus: false,
-      totalBilled: null
+      totalBilled: 0
     };
     const { status, body } = await request(app).post('/bookings').send(params);
     expect(status).toEqual(201);
@@ -197,8 +197,11 @@ describe('testing-server-routes', () => {
     expect(body.errors).toMatchObject([
       'personName is required',
       'peopleNumber is required',
+      'peopleNumber is not a number',
       'date is required',
-      'tableNumber is required'
+      'date is not a date',
+      'tableNumber is required',
+      'tableNumber is not a number'
     ]);
   });
 
@@ -211,8 +214,11 @@ describe('testing-server-routes', () => {
     expect(body.errors).toMatchObject([
       'personName is required',
       'peopleNumber is required',
+      'peopleNumber is not a number',
       'date is required',
-      'tableNumber is required'
+      'date is not a date',
+      'tableNumber is required',
+      'tableNumber is not a number'
     ]);
   });
 

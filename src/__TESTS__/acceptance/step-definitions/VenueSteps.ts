@@ -26,7 +26,7 @@ Given(/^there are venues:$/, async function (dataTable: DataTable) {
   const venueRepository: IVenueOutputPorts = this.venueRepository;
 
   await Promise.all(
-    dataTable.hashes().map(({ id, ...venueDto }) => {
+    dataTable.hashes().map(async ({ id, ...venueDto }) => {
       const venue: Venue = Venue.init(venueDto, id);
       return venueRepository.addVenue(venue);
     })
@@ -43,7 +43,7 @@ Given(/^there are available tables:$/, async function (dataTable: DataTable) {
   await Promise.all(
     dataTable
       .hashes()
-      .map(({ venueId, ...table }) =>
+      .map(async ({ venueId, ...table }) =>
         venueRepository
           .findById(venueId)
           .then((venue: Venue | undefined) => venue!.addTable(table))

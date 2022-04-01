@@ -10,11 +10,7 @@ interface ValueObjectProps {
  */
 
 export default abstract class ValueObject<VOP extends ValueObjectProps> {
-  public readonly props: VOP;
-
-  protected constructor(props: VOP) {
-    this.props = Object.freeze(props);
-  }
+  protected constructor(public readonly props: VOP) {}
 
   public equals(vo?: ValueObject<VOP>): boolean {
     if (vo === null || vo === undefined) {

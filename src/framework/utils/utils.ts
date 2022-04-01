@@ -55,8 +55,8 @@ export function keysToSnake(o: any): any {
   return o;
 }
 
-export function sleep(ms: number) {
-  new Promise((resolve) => {
+export async function sleep(ms: number) {
+  return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 }

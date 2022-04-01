@@ -3,7 +3,8 @@
   "parser": "@typescript-eslint/parser",
   "plugins": [
     "@typescript-eslint",
-    "prettier"
+    "prettier",
+    "eslint-plugin-node"
   ],
   "extends": [
     "airbnb-typescript",
@@ -15,9 +16,27 @@
     "sourceType": "module"
   },
   "rules": {
+    // Base async rules
+    "no-async-promise-executor": "error",
+    "no-await-in-loop": "error",
+    "no-promise-executor-return": "error",
+    "require-atomic-updates": "error",
+    "max-nested-callbacks": ["error", 3],
+    "no-return-await": "error",
+    "prefer-promise-reject-errors": "error",
+    // Node.js async rules
+    "node/handle-callback-err": ["error", "^(e|err|error)$"],
+    "node/no-callback-literal": "error",
+    "node/no-sync": "error",
+    // TS async rules
+    "@typescript-eslint/await-thenable": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/promise-function-async": "error",
     "import/extensions": 0,
     "import/no-extraneous-dependencies": 0,
     "react/jsx-filename-extension": 0,
-    "prettier/prettier": 2 // Means error
+    "prettier/prettier": 2 // Means error,
+
   }
 }

@@ -4,9 +4,12 @@ import Entity from '../identity/Entity';
 import UniqueEntityID from '../identity/UniqueEntityId';
 import DomainEvent from '../domain-event/DomainEvent';
 import Timestamp from '../timestamps/timestamp';
+import Guard from '../guard/Guard';
 
 export default abstract class AggregateRoot<ENT> extends Entity<ENT> {
   private _domainEvents: DomainEvent[] = [];
+
+  protected guard?: Guard;
 
   get id(): UniqueEntityID {
     return this._id;

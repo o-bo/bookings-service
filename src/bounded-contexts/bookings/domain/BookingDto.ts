@@ -4,7 +4,7 @@ export default interface BookingDto {
   date: string;
   tableNumber: number;
   openedStatus: boolean;
-  totalBilled?: number;
+  totalBilled: number;
   createdAt?: string;
   updatedAt?: string;
 }

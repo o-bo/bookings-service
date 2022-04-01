@@ -41,21 +41,21 @@ const getCacheKey = (namespace: string, params: any) => {
   return cacheKey;
 };
 
-export function retrieve(namespace: string, params: any): Promise<any> {
+export async function retrieve(namespace: string, params: any): Promise<any> {
   const cacheKey = getCacheKey(namespace, params);
   return getAsync(cacheKey)
     .then((result) => result && JSON.parse(result))
     .catch(() => null);
 }
 
-export function cache(
+export async function cache(
   namespace: string,
   params: any,
   data: any
 ): Promise<number> {
   const cacheKey = getCacheKey(namespace, params);
   return setAsync(cacheKey, JSON.stringify(data))
-    .then(() => expireAsync(cacheKey, 2))
+    .then(async () => expireAsync(cacheKey, 2))
     .then(() => 1)
     .catch(() => 0);
 }
