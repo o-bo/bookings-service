@@ -3,7 +3,6 @@ import CreateBookingDto from '../../../useCases/create-booking/CreateBookingDto'
 import Result from '../../../../../../framework/result/Result';
 import { CreateBookingError } from '../../../useCases/create-booking/CreateBookingErrors';
 import Booking from '../../../../domain/Booking';
-import { InvalidBookingError } from '../../../../domain/BookingErrors';
 import { UnexpectedError } from '../../../../../../framework/error/GenericAppError';
 import DomainEventsManager from '../../../../../../framework/domain-event/DomainEventsManager';
 import IPersistBookingInRepository from '../../outputs/IPersistBookingInRepository';
@@ -21,7 +20,7 @@ export default class CreateBookingInputPort implements ICreateBookingUseCase {
     const bookingOrError = Booking.init(createBookingDTO);
 
     if (bookingOrError.isFailure) {
-      return Result.fail(new InvalidBookingError(bookingOrError.unwrap()));
+      return bookingOrError;
     }
 
     try {
@@ -31,9 +30,9 @@ export default class CreateBookingInputPort implements ICreateBookingUseCase {
         bookingOrError.unwrap()
       );
 
-      return Result.ok(bookingOrError.unwrap());
+      return bookingOrError;
     } catch (err: any) {
-      return Result.fail(new UnexpectedError(err));
+      return bookingOrError.map(() => new UnexpectedError(err));
     }
   }
 }

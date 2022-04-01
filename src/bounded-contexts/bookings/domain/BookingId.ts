@@ -1,32 +1,30 @@
-import Guard from '../../../framework/guard/Guard';
-import Result from '../../../framework/result/Result';
 import ValueObject from '../../../framework/value-object/ValueObject';
-
-const DEFAULT_ERROR_MESSAGE = 'Booking Id is not valid';
+import {
+  IsUUIDSpecification,
+  NotNullOrUndefinedSpecification,
+  Specification,
+  SpecificationResult
+} from '../../../framework/guard/Specification';
 
 interface BookingIdProps {
-  value: string;
+  value?: string;
 }
 
 export default class BookingId extends ValueObject<BookingIdProps> {
-  get value(): string {
+  public specification: Specification<string>;
+
+  get value(): string | undefined {
     return this.props.value;
   }
 
-  private constructor(props: BookingIdProps) {
-    super(props);
+  get validation(): SpecificationResult {
+    return this.specification.isSatisfiedBy(this.value);
   }
 
-  public static create(id?: string): Result<string, BookingId> {
-    const guardResult = Guard.combine([
-      Guard.againstNullOrUndefined(id, 'id'),
-      Guard.isUUID(id, 'id')
-    ]);
-
-    if (guardResult.failed) {
-      return Result.fail(guardResult.message || DEFAULT_ERROR_MESSAGE);
-    } else {
-      return Result.ok(new BookingId({ value: id as string }));
-    }
+  constructor(bookingId?: string) {
+    super({ value: bookingId });
+    const notNull = new NotNullOrUndefinedSpecification('id');
+    const isUUID = new IsUUIDSpecification('id');
+    this.specification = notNull.and(isUUID);
   }
 }

@@ -7,29 +7,33 @@ export default abstract class RestExpressAdapter<DTO, ENT, ERR> {
 
   protected res!: express.Response;
 
-  protected _error!: ERR;
+  protected next!: express.NextFunction;
 
-  protected resultEntity!: ENT;
+  protected _error?: ERR;
 
-  protected abstract concreteError(error: ERR): any;
-  protected error(error: ERR): any {
+  protected resultEntity?: ENT;
+
+  protected abstract concreteError(error?: ERR): any;
+  protected error(error?: ERR): any {
     this._error = error;
     return this.concreteError(this._error);
   }
 
-  protected abstract concreteResponse(resultEntity: ENT): any;
-  protected response(resultEntity: ENT): any {
+  protected abstract concreteResponse(resultEntity?: ENT): any;
+  protected response(resultEntity?: ENT): any {
     this.resultEntity = resultEntity;
     return this.concreteResponse(this.resultEntity);
   }
 
-  protected abstract concreteResult(params: DTO): Promise<void | any>;
-  public result(
+  protected abstract concreteExecute(params: DTO): void;
+  public execute(
     req: express.Request,
-    res: express.Response
-  ): Promise<void | any> {
+    res: express.Response,
+    next: express.NextFunction
+  ): void {
     this.req = req;
     this.res = res;
+    this.next = next;
 
     const params = {
       ...this.req.query,
@@ -37,7 +41,7 @@ export default abstract class RestExpressAdapter<DTO, ENT, ERR> {
       ...this.req.body
     };
 
-    return this.concreteResult(params);
+    this.concreteExecute(params);
   }
 
   public static jsonResponse(
@@ -124,10 +128,9 @@ export default abstract class RestExpressAdapter<DTO, ENT, ERR> {
     return RestExpressAdapter.jsonResponse(this.res, 400, { message: 'TODO' });
   }
 
-  public fail(error: Error | any) {
-    console.log(error);
+  public fail(error?: Error | any) {
     return RestExpressAdapter.jsonResponse(this.res, 500, {
-      result: error.toString()
+      result: error?.toString()
     });
   }
 }

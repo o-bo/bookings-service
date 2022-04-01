@@ -1,5 +1,5 @@
 import { UnexpectedError } from '../../../../../../framework/error/GenericAppError';
-import Result from '../../../../../../framework/result/Result';
+import Result, { Fail, Ok } from '../../../../../../framework/result/Result';
 import {
   BookingNotFoundError,
   InvalidBookingIdError
@@ -27,31 +27,32 @@ export default class DeleteBookingInputPort implements IDeleteBookingUseCase {
   async result(
     deleteBookingDTO: DeleteBookingDto
   ): Promise<Result<DeleteBookingError, BookingId>> {
-    const bookingIdOrError = BookingId.create(deleteBookingDTO.id);
+    const bookingId = new BookingId(deleteBookingDTO.id);
+    const bookingIdValidation = bookingId.validation;
 
-    if (bookingIdOrError.isFailure) {
-      return Result.fail(new InvalidBookingIdError(bookingIdOrError.unwrap()));
+    if (bookingIdValidation.failed) {
+      return new Fail(new InvalidBookingIdError(bookingIdValidation.errors[0]));
     }
 
     try {
       const bookingOrError = await this.fetchBookingByIdOutputPort.booking(
-        bookingIdOrError.unwrap()
+        bookingId
       );
 
       if (bookingOrError.isFailure) {
-        return Result.fail(
-          new BookingNotFoundError(
-            `unable to find booking with id ${bookingIdOrError.unwrap().value}`
-          )
+        return bookingOrError.map(
+          () =>
+            new BookingNotFoundError(
+              `unable to find booking with id ${bookingId.value}`
+            )
         );
       }
 
       await this.deleteBookingOutputPort.delete(bookingOrError.unwrap());
 
-      return Result.ok(bookingIdOrError.unwrap());
+      return new Ok(bookingId);
     } catch (err: any) {
-      console.log('debug', err);
-      return Result.fail(new UnexpectedError(err));
+      return new Fail(new UnexpectedError(err));
     }
   }
 }

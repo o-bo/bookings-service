@@ -1,6 +1,5 @@
 import AggregateRoot from '../../../framework/aggregate/AggregateRoot';
-import { IGuardResult } from '../../../framework/guard/Guard';
-import Result from '../../../framework/result/Result';
+import Result, { Fail, Ok } from '../../../framework/result/Result';
 import UniqueEntityId from '../../../framework/identity/UniqueEntityId';
 import BookingDate from './BookingDate';
 import BookingDto from './BookingDto';
@@ -12,6 +11,8 @@ import BookingTotalBilled from './BookingTotalBilled';
 import BookingCreatedEvent from './events/BookingCreatedEvent';
 import BookingId from './BookingId';
 import Timestamp from '../../../framework/timestamps/timestamp';
+import { InvalidBookingError } from './BookingErrors';
+import Guard from '../../../framework/guard/Guard';
 
 interface BookingProps {
   personName: BookingPersonName;
@@ -73,53 +74,54 @@ export default class Booking extends AggregateRoot<BookingProps> {
     id?: string,
     createdAt?: Timestamp,
     updatedAt?: Timestamp
-  ): Result<IGuardResult, Booking> {
-    const personNameOrError: Result<string, BookingPersonName> =
-      BookingPersonName.create(props.personName);
-    const peopleNumberOrError: Result<string, BookingPeopleNumber> =
-      BookingPeopleNumber.create(props.peopleNumber);
-    const dateOrError: Result<string, BookingDate> = BookingDate.create(
-      props.date
+  ): Result<InvalidBookingError, Booking> {
+    const personName: BookingPersonName = new BookingPersonName(
+      props.personName
     );
-    const tableNumberOrError: Result<string, BookingTableNumber> =
-      BookingTableNumber.create(props.tableNumber);
-    const totalBilledOrError: Result<string, BookingTotalBilled> =
-      BookingTotalBilled.create(props.totalBilled);
+    const peopleNumber: BookingPeopleNumber = new BookingPeopleNumber(
+      props.peopleNumber
+    );
+    const date: BookingDate = new BookingDate(props.date);
+    const tableNumber: BookingTableNumber = new BookingTableNumber(
+      props.tableNumber
+    );
+    const totalBilled: BookingTotalBilled = new BookingTotalBilled(
+      props.totalBilled || 0
+    );
 
-    const guardResult = Result.combine([
-      personNameOrError,
-      peopleNumberOrError,
-      dateOrError,
-      tableNumberOrError,
-      totalBilledOrError
+    /*in ctor replace by this.guard*/
+    const bookingGuard = new Guard([
+      personName.validation,
+      peopleNumber.validation,
+      date.validation,
+      tableNumber.validation,
+      totalBilled.validation
     ]);
+    const guardResult = bookingGuard.result;
 
-    if (guardResult.isFailure) {
-      return Result.fail(guardResult.unwrap());
+    if (guardResult.failed) {
+      return new Fail(new InvalidBookingError(guardResult.errors));
     }
 
-    const bookingIdOrError: Result<string, BookingId> = BookingId.create(id);
+    const bookingId: BookingId = new BookingId(id);
 
     const booking = new Booking(
       {
-        personName: personNameOrError.unwrap(),
-        peopleNumber: peopleNumberOrError.unwrap(),
-        date: dateOrError.unwrap(),
-        tableNumber: tableNumberOrError.unwrap(),
-        ...(totalBilledOrError.unwrap() && {
-          totalBilled: totalBilledOrError.unwrap()
-        }),
+        personName,
+        peopleNumber,
+        date,
+        tableNumber,
+        totalBilled,
         openedStatus: false
       },
-      bookingIdOrError.unwrap(
-        (bId: BookingId) => new BookingEntityId(bId.value),
-        () => undefined
-      ),
+      bookingId.validation.succeeded
+        ? new BookingEntityId(bookingId!.value)
+        : undefined,
       createdAt,
       updatedAt
     );
 
-    return Result.ok(booking);
+    return new Ok(booking);
   }
 
   toDto(): BookingDto {

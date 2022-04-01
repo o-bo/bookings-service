@@ -1,4 +1,4 @@
-import express, { Request, Response, Router } from 'express';
+import express, { NextFunction, Request, Response, Router } from 'express';
 import { validate } from 'uuid';
 import CreateBookingExpressAdapter from './routes/CreateBookingExpressAdapter';
 import DeleteBookingExpressAdapter from './routes/DeleteBookingExpressAdapter';
@@ -12,11 +12,8 @@ import FetchBookingByIdPostgresAdapter from '../../../spi/repositories/postgres/
 
 const router: Router = express.Router();
 
-const asyncHandler = (fn: any) => (req: Request, res: Response, next: any) =>
-  Promise.resolve(fn(req, res, next)).catch(next);
-
 /* GET /health */
-router.get('/health', async (req: Request, res: Response) =>
+router.get('/health', (req: Request, res: Response) =>
   res.status(200).send({ status: 'ok' })
 );
 
@@ -25,38 +22,35 @@ GET /bookings
 curl -X GET -H "Content-Type: application/json" \
     localhost:3000/bookings\?date\=2021\-10\-10
 */
-router.get(
-  '/bookings/',
-  asyncHandler(async (req: Request, res: Response) => {
-    const { date, tableNumber, openedStatus } = req.query;
+router.get('/bookings/', (req: Request, res: Response, next: NextFunction) => {
+  const { date, tableNumber, openedStatus } = req.query;
 
-    if (!date) {
-      return res.status(400).send({
-        type: 'error',
-        reason: 'REQUIRED_ERROR',
-        message: 'DATE_MANDATORY'
-      });
-    }
+  if (!date) {
+    res.status(400).send({
+      type: 'error',
+      reason: 'REQUIRED_ERROR',
+      message: 'DATE_MANDATORY'
+    });
+  }
 
-    if (Number.isNaN(Date.parse(date as string))) {
-      return res.status(422).send({
-        type: 'error',
-        reason: 'VALIDATION_ERROR',
-        message: 'DATE_BAD_FORMAT'
-      });
-    }
+  if (Number.isNaN(Date.parse(date as string))) {
+    res.status(422).send({
+      type: 'error',
+      reason: 'VALIDATION_ERROR',
+      message: 'DATE_BAD_FORMAT'
+    });
+  }
 
-    const bookings = await db('bookings')
-      .where({
-        date,
-        ...(tableNumber && { table_number: tableNumber }),
-        ...(openedStatus && { opened_status: openedStatus })
-      })
-      .select();
-
-    return res.status(200).send(bookings);
-  })
-);
+  db('bookings')
+    .where({
+      date,
+      ...(tableNumber && { table_number: tableNumber }),
+      ...(openedStatus && { opened_status: openedStatus })
+    })
+    .select()
+    .then((bookings) => res.status(200).send(bookings))
+    .catch(next);
+});
 
 /*
 GET /bookings/id
@@ -65,23 +59,25 @@ curl -X GET -H "Content-Type: application/json" \
 */
 router.get(
   '/bookings/:id',
-  asyncHandler(async (req: Request, res: Response) => {
-    const [booking] = await db('bookings')
+  (req: Request, res: Response, next: NextFunction) => {
+    db('bookings')
       .where({
         id: req.params.id
       })
-      .select();
+      .select()
+      .then(([booking]) => {
+        if (!booking) {
+          res.status(404).send({
+            type: 'error',
+            reason: 'NOT_FOUND_ERROR',
+            message: 'BOOKING_NOT_FOUND'
+          });
+        }
 
-    if (!booking) {
-      return res.status(404).send({
-        type: 'error',
-        reason: 'NOT_FOUND_ERROR',
-        message: 'BOOKING_NOT_FOUND'
-      });
-    }
-
-    return res.status(200).send(booking);
-  })
+        res.status(200).send(booking);
+      })
+      .catch(next);
+  }
 );
 
 /*
@@ -92,7 +88,7 @@ curl -X PUT -H "Content-Type: application/json" \
 */
 router.put(
   '/bookings/:id',
-  asyncHandler(async (req: Request, res: Response) => {
+  (req: Request, res: Response, next: NextFunction) => {
     const errors = [];
     const {
       personName,
@@ -141,21 +137,24 @@ router.put(
       ...(totalBilled && { total_billed: totalBilled })
     };
 
-    const [updatedBooking] = (await db('bookings')
+    db('bookings')
       .where({
         id
       })
-      .update(params, ['*'])) as unknown as Array<any>;
+      .update(params, ['*'])
+      .then((result: any) => {
+        const [updatedBooking] = result as unknown as Array<any>;
+        if (!updatedBooking) {
+          res.status(404).send({
+            type: 'error',
+            reason: 'NOT_FOUND_ERROR'
+          });
+        }
 
-    if (!updatedBooking) {
-      return res.status(404).send({
-        type: 'error',
-        reason: 'NOT_FOUND_ERROR'
-      });
-    }
-
-    return res.status(200).send(keysToCamel(updatedBooking));
-  })
+        res.status(200).send(keysToCamel(updatedBooking));
+      })
+      .catch(next);
+  }
 );
 
 /*
@@ -165,22 +164,21 @@ curl -X DELETE -H "Content-Type: application/json" \
 */
 router.delete(
   '/bookings/:id',
-  asyncHandler(async (req: Request, res: Response) => {
+  (req: Request, res: Response, next: NextFunction) => {
     // const controller = container.get<DeleteBookingRestAdapter>(
     //   SERVICE_IDENTIFIER.DELETE_BOOKING_REST_ADAPTER
     // );
 
-    const deleteBookingPostgresAdapter =
-      DeleteBookingPostgresAdapter.instance();
+    const deleteBookingPostgresAdapter = new DeleteBookingPostgresAdapter();
     const fetchBookingByIdPostgresAdapter =
-      FetchBookingByIdPostgresAdapter.instance();
+      new FetchBookingByIdPostgresAdapter();
     const deleteBookingInputPort = new DeleteBookingInputPort(
       deleteBookingPostgresAdapter,
       fetchBookingByIdPostgresAdapter
     );
     const controller = new DeleteBookingExpressAdapter(deleteBookingInputPort);
-    return controller.result(req, res);
-  })
+    controller.execute(req, res, next);
+  }
 );
 
 /*
@@ -189,21 +187,17 @@ curl -X POST -H "Content-Type: application/json" \
     -d '{"personName": "FooBar","peopleNumber":4,"date":"2021-10-10","tableNumber":42}' \
     localhost:3000/bookings
 */
-router.post(
-  '/bookings/',
-  asyncHandler(async (req: Request, res: Response) => {
-    // const controller = container.get<CreateBookingRestAdapter>(
-    //   SERVICE_IDENTIFIER.CREATE_BOOKING_REST_ADAPTER
-    // );
+router.post('/bookings/', (req: Request, res: Response, next: NextFunction) => {
+  // const controller = container.get<CreateBookingRestAdapter>(
+  //   SERVICE_IDENTIFIER.CREATE_BOOKING_REST_ADAPTER
+  // );
 
-    const createBookingPostgresAdapter =
-      PersistBookingPostgresAdapter.instance();
-    const createBookingInputPort = new CreateBookingInputPort(
-      createBookingPostgresAdapter
-    );
-    const controller = new CreateBookingExpressAdapter(createBookingInputPort);
-    return controller.result(req, res);
-  })
-);
+  const createBookingPostgresAdapter = new PersistBookingPostgresAdapter();
+  const createBookingInputPort = new CreateBookingInputPort(
+    createBookingPostgresAdapter
+  );
+  const controller = new CreateBookingExpressAdapter(createBookingInputPort);
+  controller.execute(req, res, next);
+});
 
 export default router;

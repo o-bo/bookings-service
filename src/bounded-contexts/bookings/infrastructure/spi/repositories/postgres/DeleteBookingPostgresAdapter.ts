@@ -5,15 +5,6 @@ import IDeleteBookingFromRepository from '../../../../application/ports/outputs/
 export default class DeleteBookingPostgresAdapter
   implements IDeleteBookingFromRepository
 {
-  private static _instance: DeleteBookingPostgresAdapter;
-
-  public static instance() {
-    if (!DeleteBookingPostgresAdapter._instance) {
-      this._instance = new DeleteBookingPostgresAdapter();
-    }
-    return this._instance;
-  }
-
   async delete(booking: Booking): Promise<void> {
     await db('bookings')
       .where({

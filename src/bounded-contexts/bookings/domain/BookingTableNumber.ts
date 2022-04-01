@@ -1,34 +1,30 @@
-import Guard from '../../../framework/guard/Guard';
-import Result from '../../../framework/result/Result';
 import ValueObject from '../../../framework/value-object/ValueObject';
-
-const DEFAULT_ERROR_MESSAGE = 'Table number is not valid';
+import {
+  IsNumberSpecification,
+  NotNullOrUndefinedSpecification,
+  Specification,
+  SpecificationResult
+} from '../../../framework/guard/Specification';
 
 interface BookingTableNumberProps {
   value: number;
 }
 
 export default class BookingTableNumber extends ValueObject<BookingTableNumberProps> {
+  public specification: Specification<number>;
+
   get value(): number {
     return this.props.value;
   }
 
-  private constructor(props: BookingTableNumberProps) {
-    super(props);
+  get validation(): SpecificationResult {
+    return this.specification.isSatisfiedBy(this.value);
   }
 
-  public static create(
-    tableNumber: number
-  ): Result<string, BookingTableNumber> {
-    const guardResult = Guard.againstNullOrUndefined(
-      tableNumber,
-      'tableNumber'
-    );
-
-    if (guardResult.failed) {
-      return Result.fail(guardResult.message || DEFAULT_ERROR_MESSAGE);
-    } else {
-      return Result.ok(new BookingTableNumber({ value: tableNumber }));
-    }
+  constructor(tableNumber: number) {
+    super({ value: tableNumber });
+    const notNull = new NotNullOrUndefinedSpecification('tableNumber');
+    const isNumber = new IsNumberSpecification('tableNumber');
+    this.specification = notNull.and(isNumber);
   }
 }

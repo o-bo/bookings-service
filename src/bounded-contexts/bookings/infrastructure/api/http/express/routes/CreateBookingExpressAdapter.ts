@@ -17,27 +17,32 @@ export default class CreateBookingExpressAdapter extends RestExpressAdapter<
     this.bookingInputPort = bookingInputPort;
   }
 
-  concreteError(createBookingError: CreateBookingError) {
-    switch (createBookingError.constructor) {
-      case InvalidBookingError: {
-        return this.unprocessable(createBookingError);
-      }
-      default: {
-        return this.fail(createBookingError);
+  concreteError(createBookingError?: CreateBookingError) {
+    if (createBookingError) {
+      switch (createBookingError.constructor) {
+        case InvalidBookingError: {
+          this.unprocessable(createBookingError);
+        }
+        default: {
+          this.fail(createBookingError);
+        }
       }
     }
+    this.fail(createBookingError);
   }
 
-  concreteResponse(createdBooking: Booking) {
-    return this.created(createdBooking.toDto());
+  concreteResponse(createdBooking?: Booking) {
+    return this.created(createdBooking!.toDto());
   }
 
-  async concreteResult(dto: CreateBookingDto): Promise<any> {
-    try {
-      const result = await this.bookingInputPort.result(dto);
-      return result.unwrap(this.response.bind(this), this.error.bind(this));
-    } catch (err: any) {
-      return this.fail(err);
-    }
+  concreteExecute(dto: CreateBookingDto): void {
+    this.bookingInputPort
+      .result(dto)
+      .then((result) => {
+        result.unwrap(this.response.bind(this), this.error.bind(this));
+      })
+      .catch((err) => {
+        this.next(err);
+      });
   }
 }

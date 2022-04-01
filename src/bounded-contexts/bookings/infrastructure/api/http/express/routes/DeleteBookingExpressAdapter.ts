@@ -20,18 +20,21 @@ export default class DeleteBookingExpressAdapter extends RestExpressAdapter<
     this.bookingInputPort = bookingInputPort;
   }
 
-  protected concreteError(error: DeleteBookingError) {
-    switch (error.constructor) {
-      case BookingNotFoundError: {
-        return this.notFound(error);
-      }
-      case InvalidBookingIdError: {
-        return this.unprocessable(error);
-      }
-      default: {
-        return this.fail(error);
+  protected concreteError(deleteBookingError?: DeleteBookingError) {
+    if (deleteBookingError) {
+      switch (deleteBookingError.constructor) {
+        case BookingNotFoundError: {
+          this.notFound(deleteBookingError);
+        }
+        case InvalidBookingIdError: {
+          this.unprocessable(deleteBookingError);
+        }
+        default: {
+          this.fail(deleteBookingError);
+        }
       }
     }
+    this.fail(deleteBookingError);
   }
 
   protected concreteResponse(deletedBookingId: BookingId) {
@@ -40,12 +43,14 @@ export default class DeleteBookingExpressAdapter extends RestExpressAdapter<
     } as DeleteBookingDto);
   }
 
-  async concreteResult(dto: DeleteBookingDto): Promise<any> {
-    try {
-      const result = await this.bookingInputPort.result(dto);
-      return result.unwrap(this.response.bind(this), this.error.bind(this));
-    } catch (err: any) {
-      return this.fail(err);
-    }
+  concreteExecute(dto: DeleteBookingDto): void {
+    this.bookingInputPort
+      .result(dto)
+      .then((result) => {
+        result.unwrap(this.response.bind(this), this.error.bind(this));
+      })
+      .catch((err) => {
+        this.next(err);
+      });
   }
 }

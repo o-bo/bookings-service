@@ -1,31 +1,30 @@
-import Guard from '../../../framework/guard/Guard';
-import Result from '../../../framework/result/Result';
 import ValueObject from '../../../framework/value-object/ValueObject';
-
-const DEFAULT_ERROR_MESSAGE = 'Total billed is not valid';
+import {
+  IsNumberSpecification,
+  NotNullOrUndefinedSpecification,
+  Specification,
+  SpecificationResult
+} from '../../../framework/guard/Specification';
 
 interface BookingTotalBilledProps {
-  value: number | null | undefined;
+  value: number;
 }
 
 export default class BookingTotalBilled extends ValueObject<BookingTotalBilledProps> {
-  get value(): number | null | undefined {
+  public specification: Specification<number>;
+
+  get value(): number {
     return this.props.value;
   }
 
-  private constructor(props: BookingTotalBilledProps) {
-    super(props);
+  get validation(): SpecificationResult {
+    return this.specification.isSatisfiedBy(this.value);
   }
 
-  public static create(
-    totalBilled?: number
-  ): Result<string, BookingTotalBilled> {
-    const guardResult = Guard.isNumber(totalBilled, 'totalBilled');
-
-    if (guardResult.failed) {
-      return Result.fail(guardResult.message || DEFAULT_ERROR_MESSAGE);
-    } else {
-      return Result.ok(new BookingTotalBilled({ value: totalBilled }));
-    }
+  constructor(totalBilled: number) {
+    super({ value: totalBilled });
+    const notNull = new NotNullOrUndefinedSpecification('totalBilled');
+    const isNumber = new IsNumberSpecification('totalBilled');
+    this.specification = notNull.and(isNumber);
   }
 }

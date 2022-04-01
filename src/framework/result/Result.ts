@@ -1,13 +1,13 @@
-export default class Result<ERR, RSLT> {
+export default abstract class Result<ERR, RSLT> {
   public isSuccess: boolean;
 
   public isFailure: boolean;
 
   public error?: ERR;
 
-  private readonly value?: RSLT;
+  protected readonly value?: RSLT;
 
-  public constructor(isSuccess: boolean, error?: any, value?: RSLT) {
+  protected constructor(isSuccess: boolean, error?: any, value?: RSLT) {
     if (isSuccess && error) {
       throw new Error(
         'InvalidOperation: A result cannot be successful and contain an error'
@@ -47,26 +47,52 @@ export default class Result<ERR, RSLT> {
   }
 
   // TODO: type me
-  public unwrap(successFn?: any, errorFn?: any): any {
-    if (successFn && this.isSuccess) {
+  public abstract unwrap(
+    successFn?: (arg0?: RSLT) => any,
+    errorFn?: (arg0?: ERR) => any
+  ): any;
+
+  public abstract map(fn: (arg0?: RSLT | ERR) => any): Result<ERR, any>;
+}
+
+export class Ok<RSLT> extends Result<never, RSLT> {
+  constructor(value?: RSLT) {
+    super(true, null, value);
+  }
+
+  map(fn: (arg0?: RSLT) => Result<never, any>): Result<never, any> {
+    return new Ok(fn(this.value));
+  }
+
+  unwrap(successFn: (arg0?: RSLT) => any): any {
+    if (successFn) {
       return successFn(this.value);
     }
-    if (errorFn && this.isFailure) {
+    return this.value;
+  }
+}
+
+export class Fail<ERR, RSLT> extends Result<ERR, never> {
+  constructor(err: ERR) {
+    super(false, err);
+  }
+
+  map(fn: (arg0?: ERR) => any): Result<ERR, any> {
+    return new Fail(fn());
+  }
+
+  unwrap(successFn: (arg0?: any) => RSLT, errorFn: (arg0?: ERR) => any): any {
+    if (errorFn) {
       return errorFn(this.error);
     }
-    if (this.isSuccess) return this.value;
-    if (this.isFailure) return this.error;
+    return this.error;
   }
+}
 
-  public static ok<ERR, RSLT>(value?: RSLT): Result<ERR, RSLT> {
-    return new Result<ERR, RSLT>(true, null, value);
-  }
+export class CombinedResults<ERR, RSLT> {
+  private _result: Result<ERR, any>;
 
-  public static fail<ERR, RSLT>(error: ERR): Result<ERR, RSLT> {
-    return new Result<ERR, RSLT>(false, error);
-  }
-
-  public static combine(results: Result<any, any>[]): Result<any, any> {
+  public constructor(results: Result<any, any>[], errorFn: (arg0: any) => ERR) {
     const errors = results.reduce(
       (acc: any[], result: Result<any, any>) =>
         result.isFailure ? [...acc, result.errorValue()] : acc,
@@ -74,8 +100,13 @@ export default class Result<ERR, RSLT> {
     );
 
     if (errors.length > 0) {
-      return Result.fail(errors);
+      this._result = new Fail<ERR, RSLT>(errorFn(errors));
+    } else {
+      this._result = new Ok<any>();
     }
-    return Result.ok();
+  }
+
+  get result(): Result<ERR, any> {
+    return this._result;
   }
 }

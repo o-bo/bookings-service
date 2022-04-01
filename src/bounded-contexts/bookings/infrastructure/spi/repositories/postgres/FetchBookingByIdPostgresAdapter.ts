@@ -1,23 +1,16 @@
 import db from './index';
-import { IGuardResult } from '../../../../../../framework/guard/Guard';
 import Result from '../../../../../../framework/result/Result';
 import Booking from '../../../../domain/Booking';
 import BookingId from '../../../../domain/BookingId';
 import IFetchBookingByIdFromRepository from '../../../../application/ports/outputs/IFetchBookingByIdFromRepository';
+import { InvalidBookingError } from '../../../../domain/BookingErrors';
 
 export default class FetchBookingByIdPostgresAdapter
   implements IFetchBookingByIdFromRepository
 {
-  private static _instance: FetchBookingByIdPostgresAdapter;
-
-  public static instance() {
-    if (!FetchBookingByIdPostgresAdapter._instance) {
-      this._instance = new FetchBookingByIdPostgresAdapter();
-    }
-    return this._instance;
-  }
-
-  async booking(bookingId: BookingId): Promise<Result<IGuardResult, Booking>> {
+  async booking(
+    bookingId: BookingId
+  ): Promise<Result<InvalidBookingError, Booking>> {
     const [booking] = await db('bookings').select('*').where({
       id: bookingId.value
     });

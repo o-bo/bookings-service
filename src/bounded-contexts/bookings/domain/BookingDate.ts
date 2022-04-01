@@ -1,32 +1,30 @@
-import Guard from '../../../framework/guard/Guard';
-import Result from '../../../framework/result/Result';
 import ValueObject from '../../../framework/value-object/ValueObject';
-
-const DEFAULT_ERROR_MESSAGE = 'Booking date is not valid';
+import {
+  IsDateSpecification,
+  NotNullOrUndefinedSpecification,
+  Specification,
+  SpecificationResult
+} from '../../../framework/guard/Specification';
 
 interface BookingDateProps {
   value: string;
 }
 
 export default class BookingDate extends ValueObject<BookingDateProps> {
+  public specification: Specification<string>;
+
   get value(): string {
     return this.props.value;
   }
 
-  private constructor(props: BookingDateProps) {
-    super(props);
+  get validation(): SpecificationResult {
+    return this.specification.isSatisfiedBy(this.value);
   }
 
-  public static create(date: string): Result<string, BookingDate> {
-    const guardResult = Guard.combine([
-      Guard.againstNullOrUndefined(date, 'date'),
-      Guard.isDate(date, 'date')
-    ]);
-
-    if (!guardResult.succeeded) {
-      return Result.fail(guardResult.message || DEFAULT_ERROR_MESSAGE);
-    } else {
-      return Result.ok(new BookingDate({ value: date }));
-    }
+  constructor(date: string) {
+    super({ value: date });
+    const notNull = new NotNullOrUndefinedSpecification('date');
+    const isDate = new IsDateSpecification('date');
+    this.specification = notNull.and(isDate);
   }
 }
