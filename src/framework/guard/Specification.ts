@@ -3,8 +3,8 @@
 import { validate as validateUUID } from 'uuid';
 
 export interface SpecificationResult {
-  succeeded?: boolean;
-  failed?: boolean;
+  succeeded: boolean;
+  failed: boolean;
   errors: string[];
 }
 

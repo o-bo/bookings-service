@@ -1,6 +1,4 @@
 import AggregateRoot from '../../../framework/aggregate/AggregateRoot';
-import Result, { Fail, Ok } from '../../../framework/result/Result';
-import UniqueEntityId from '../../../framework/identity/UniqueEntityId';
 import BookingDate from './BookingDate';
 import BookingDto from './BookingDto';
 import BookingEntityId from './BookingEntityId';
@@ -11,7 +9,6 @@ import BookingTotalBilled from './BookingTotalBilled';
 import BookingCreatedEvent from './events/BookingCreatedEvent';
 import BookingId from './BookingId';
 import Timestamp from '../../../framework/timestamps/timestamp';
-import { InvalidBookingError } from './BookingErrors';
 import Guard from '../../../framework/guard/Guard';
 
 interface BookingProps {
@@ -52,29 +49,12 @@ export default class Booking extends AggregateRoot<BookingProps> {
     return this.props.totalBilled;
   }
 
-  private constructor(
-    props: BookingProps,
-    id?: UniqueEntityId,
-    createdAt?: Timestamp,
-    updatedAt?: Timestamp
-  ) {
-    super(props, id, createdAt, updatedAt);
-
-    // If the id wasn't provided, it means that we're creating a new
-    // user, so we should create a UserCreatedEvent.
-    const idWasProvided = !!id;
-
-    if (!idWasProvided) {
-      this.addDomainEvent(new BookingCreatedEvent(this));
-    }
-  }
-
-  public static init(
+  constructor(
     props: BookingDto,
     id?: string,
     createdAt?: Timestamp,
     updatedAt?: Timestamp
-  ): Result<InvalidBookingError, Booking> {
+  ) {
     const personName: BookingPersonName = new BookingPersonName(
       props.personName
     );
@@ -89,23 +69,9 @@ export default class Booking extends AggregateRoot<BookingProps> {
       props.totalBilled || 0
     );
 
-    /*in ctor replace by this.guard*/
-    const bookingGuard = new Guard([
-      personName.validation,
-      peopleNumber.validation,
-      date.validation,
-      tableNumber.validation,
-      totalBilled.validation
-    ]);
-    const guardResult = bookingGuard.result;
-
-    if (guardResult.failed) {
-      return new Fail(new InvalidBookingError(guardResult.errors));
-    }
-
     const bookingId: BookingId = new BookingId(id);
 
-    const booking = new Booking(
+    super(
       {
         personName,
         peopleNumber,
@@ -121,7 +87,29 @@ export default class Booking extends AggregateRoot<BookingProps> {
       updatedAt
     );
 
-    return new Ok(booking);
+    this.guard = new Guard([
+      personName.validation,
+      peopleNumber.validation,
+      date.validation,
+      tableNumber.validation,
+      totalBilled.validation
+    ]);
+
+    // If the id wasn't provided, it means that we're creating a new
+    // user, so we should create a UserCreatedEvent.
+    const idWasProvided = !!id;
+
+    if (!idWasProvided) {
+      this.addDomainEvent(new BookingCreatedEvent(this));
+    }
+  }
+
+  get validated(): boolean {
+    return this.guard?.success ?? true;
+  }
+
+  get errors(): string[] {
+    return this.guard?.errors ?? [];
   }
 
   toDto(): BookingDto {

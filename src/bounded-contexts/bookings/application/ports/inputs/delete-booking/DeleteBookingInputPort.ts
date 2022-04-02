@@ -35,20 +35,17 @@ export default class DeleteBookingInputPort implements IDeleteBookingUseCase {
     }
 
     try {
-      const bookingOrError = await this.fetchBookingByIdOutputPort.booking(
-        bookingId
-      );
+      const booking = await this.fetchBookingByIdOutputPort.booking(bookingId);
 
-      if (bookingOrError.isFailure) {
-        return bookingOrError.map(
-          () =>
-            new BookingNotFoundError(
-              `unable to find booking with id ${bookingId.value}`
-            )
+      if (!booking) {
+        return new Fail(
+          new BookingNotFoundError(
+            `unable to find booking with id ${bookingId.value}`
+          )
         );
       }
 
-      await this.deleteBookingOutputPort.delete(bookingOrError.unwrap());
+      await this.deleteBookingOutputPort.delete(booking);
 
       return new Ok(bookingId);
     } catch (err: any) {

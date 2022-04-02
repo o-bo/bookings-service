@@ -13,4 +13,12 @@ export default class Guard {
       new TrueSpecification().isSatisfiedBy()
     );
   }
+
+  get success(): boolean {
+    return this.result.succeeded;
+  }
+
+  get errors(): string[] {
+    return this.result.errors;
+  }
 }

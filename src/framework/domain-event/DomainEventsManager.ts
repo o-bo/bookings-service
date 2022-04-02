@@ -70,7 +70,9 @@ export default class DomainEventsManager {
    * aggregate.
    */
 
-  public static dispatchEventsForAggregate<T>(entity: AggregateRoot<T>): void {
+  public static dispatchEventsForAggregate<T>(
+    entity: AggregateRoot<any>
+  ): void {
     const aggregate = this.findMarkedAggregateById(entity.id);
 
     if (aggregate) {
