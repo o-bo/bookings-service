@@ -1,33 +1,12 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 
-import { validate as validateUUID } from 'uuid';
+import Specification, {
+  AbstractSpecification,
+  SpecificationResult
+} from './specification';
 
-export interface SpecificationResult {
-  succeeded: boolean;
-  failed: boolean;
-  errors: string[];
-}
-
-export interface Specification<T> {
-  isSatisfiedBy(t?: T): SpecificationResult;
-  and(specification: Specification<T>): Specification<T>;
-  or(specification: Specification<T>): Specification<T>;
-}
-
-export default abstract class AbstractSpecification<T>
-  implements Specification<T>
-{
-  protected constructor(protected readonly message: string) {}
-  abstract isSatisfiedBy(t?: T): SpecificationResult;
-
-  and(specification: Specification<T>): Specification<T> {
-    return new AndSpecification<T>(this, specification);
-  }
-
-  or(specification: Specification<T>): Specification<T> {
-    return new OrSpecification<T>(this, specification);
-  }
-}
+export * from './IsUUIDSpecification';
+export * from './specification';
 
 export class AndSpecification<T> extends AbstractSpecification<T> {
   #spec1: Specification<T>;
@@ -172,23 +151,6 @@ export class IsNumberSpecification extends AbstractSpecification<string> {
       argument === undefined ||
       !Number.isInteger(argument)
     ) {
-      return {
-        succeeded: false,
-        failed: true,
-        errors: [this.message]
-      };
-    }
-    return { succeeded: true, failed: false, errors: [] };
-  }
-}
-
-export class IsUUIDSpecification extends AbstractSpecification<string> {
-  constructor(argumentName: string) {
-    super(`${argumentName} is not a UUID`);
-  }
-
-  isSatisfiedBy(argument?: string): SpecificationResult {
-    if (!argument || !validateUUID(argument)) {
       return {
         succeeded: false,
         failed: true,

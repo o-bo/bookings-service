@@ -1,4 +1,5 @@
-import { SpecificationResult, TrueSpecification } from './Specification';
+import { TrueSpecification } from './specifications';
+import { SpecificationResult } from './specifications/specification';
 
 export default class Guard {
   constructor(private readonly specificationResults: SpecificationResult[]) {}

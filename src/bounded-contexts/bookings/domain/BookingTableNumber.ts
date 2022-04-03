@@ -1,10 +1,11 @@
 import ValueObject from '../../../framework/value-object/ValueObject';
 import {
   IsNumberSpecification,
-  NotNullOrUndefinedSpecification,
-  Specification,
+  NotNullOrUndefinedSpecification
+} from '../../../framework/guard/specifications';
+import Specification, {
   SpecificationResult
-} from '../../../framework/guard/Specification';
+} from '../../../framework/guard/specifications/specification';
 
 interface BookingTableNumberProps {
   value: number;

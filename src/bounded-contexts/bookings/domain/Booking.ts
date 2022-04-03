@@ -9,7 +9,7 @@ import BookingTotalBilled from './BookingTotalBilled';
 import BookingCreatedEvent from './events/BookingCreatedEvent';
 import BookingId from './BookingId';
 import Timestamp from '../../../framework/timestamps/timestamp';
-import Guard from '../../../framework/guard/Guard';
+import Guard from '../../../framework/guard';
 
 interface BookingProps {
   personName: BookingPersonName;

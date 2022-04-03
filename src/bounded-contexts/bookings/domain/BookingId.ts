@@ -1,10 +1,11 @@
 import ValueObject from '../../../framework/value-object/ValueObject';
 import {
   IsUUIDSpecification,
-  NotNullOrUndefinedSpecification,
-  Specification,
+  NotNullOrUndefinedSpecification
+} from '../../../framework/guard/specifications';
+import Specification, {
   SpecificationResult
-} from '../../../framework/guard/Specification';
+} from '../../../framework/guard/specifications/specification';
 
 interface BookingIdProps {
   value?: string;

@@ -1,10 +1,11 @@
 import ValueObject from '../../../framework/value-object/ValueObject';
 import {
   IsDateSpecification,
-  NotNullOrUndefinedSpecification,
-  Specification,
+  NotNullOrUndefinedSpecification
+} from '../../../framework/guard/specifications';
+import Specification, {
   SpecificationResult
-} from '../../../framework/guard/Specification';
+} from '../../../framework/guard/specifications/specification';
 
 interface BookingDateProps {
   value: string;

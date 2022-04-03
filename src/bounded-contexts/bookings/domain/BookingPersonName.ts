@@ -1,9 +1,8 @@
 import ValueObject from '../../../framework/value-object/ValueObject';
-import {
-  NotNullOrUndefinedSpecification,
-  Specification,
+import { NotNullOrUndefinedSpecification } from '../../../framework/guard/specifications';
+import Specification, {
   SpecificationResult
-} from '../../../framework/guard/Specification';
+} from '../../../framework/guard/specifications/specification';
 
 interface BookingPersonNameProps {
   value: string;
