@@ -1,3 +1,4 @@
+import DomainEventsManager from '../../../../../../../framework/domain-event/DomainEventsManager';
 import IPersistBookingInRepository from '../../../../../application/ports/outputs/IPersistBookingInRepository';
 import Booking from '../../../../../domain/Booking';
 import db from '../index';
