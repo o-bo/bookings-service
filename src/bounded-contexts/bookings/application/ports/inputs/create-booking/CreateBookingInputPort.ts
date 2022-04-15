@@ -1,12 +1,11 @@
-import ICreateBookingUseCase from '../../../useCases/create-booking/ICreateBookingUseCase';
-import CreateBookingDto from '../../../useCases/create-booking/CreateBookingDto';
-import Result, { Fail, Ok } from '../../../../../../framework/result/Result';
-import { CreateBookingError } from '../../../useCases/create-booking/CreateBookingErrors';
-import Booking from '../../../../domain/Booking';
 import { UnexpectedError } from '../../../../../../framework/error/GenericAppError';
-import DomainEventsManager from '../../../../../../framework/domain-event/DomainEventsManager';
-import IPersistBookingInRepository from '../../outputs/IPersistBookingInRepository';
+import Result, { Fail, Ok } from '../../../../../../framework/result/Result';
+import Booking from '../../../../domain/Booking';
 import { InvalidBookingError } from '../../../../domain/BookingErrors';
+import CreateBookingDto from '../../../useCases/create-booking/CreateBookingDto';
+import { CreateBookingError } from '../../../useCases/create-booking/CreateBookingErrors';
+import ICreateBookingUseCase from '../../../useCases/create-booking/ICreateBookingUseCase';
+import IPersistBookingInRepository from '../../outputs/IPersistBookingInRepository';
 
 export default class CreateBookingInputPort implements ICreateBookingUseCase {
   protected readonly persistBookingOutputPort: IPersistBookingInRepository;
@@ -26,8 +25,6 @@ export default class CreateBookingInputPort implements ICreateBookingUseCase {
 
     try {
       await this.persistBookingOutputPort.persist(booking);
-
-      DomainEventsManager.dispatchEventsForAggregate<Booking>(booking);
 
       return new Ok(booking);
     } catch (err: any) {

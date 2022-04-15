@@ -1,6 +1,6 @@
-import db from '../index';
-import Booking from '../../../../../domain/Booking';
 import IPersistBookingInRepository from '../../../../../application/ports/outputs/IPersistBookingInRepository';
+import Booking from '../../../../../domain/Booking';
+import db from '../index';
 
 export default class PersistBookingPostgresAdapter
   implements IPersistBookingInRepository
@@ -10,6 +10,9 @@ export default class PersistBookingPostgresAdapter
 
     await db('bookings')
       .insert(rawBooking, ['*'])
+      .then(() => {
+        DomainEventsManager.dispatchEventsForAggregate<Booking>(booking);
+      })
       .catch(() => null as unknown as Array<any>);
   }
 }
